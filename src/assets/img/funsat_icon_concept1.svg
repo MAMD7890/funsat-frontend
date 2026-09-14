@@ -1,0 +1,17 @@
+<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hexGrad" x1="0" y1="0" x2="300" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#0B4F4A"/>
+    </linearGradient>
+  </defs>
+  <polygon points="275,150 212.5,258.25 87.5,258.25 25,150 87.5,41.75 212.5,41.75" fill="url(#hexGrad)"/>
+  <polygon points="275,150 212.5,258.25 87.5,258.25 25,150 87.5,41.75 212.5,41.75" fill="none" stroke="#0B4F4A" stroke-width="3" opacity="0.4"/>
+  <circle cx="275" cy="150" r="6.5" fill="#F59E0B"/>
+  <circle cx="212.5" cy="258.25" r="6.5" fill="#F59E0B"/>
+  <circle cx="87.5" cy="258.25" r="6.5" fill="#F59E0B"/>
+  <circle cx="25" cy="150" r="6.5" fill="#F59E0B"/>
+  <circle cx="87.5" cy="41.75" r="6.5" fill="#F59E0B"/>
+  <circle cx="212.5" cy="41.75" r="6.5" fill="#F59E0B"/>
+  <text x="150" y="206" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="150" font-weight="800" fill="#FFFFFF">F</text>
+</svg>

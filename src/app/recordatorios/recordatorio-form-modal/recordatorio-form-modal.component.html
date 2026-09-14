@@ -1,0 +1,69 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ esEdicion ? 'Editar recordatorio' : 'Nuevo recordatorio de mantenimiento' }}</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss()">
+    <span>&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="alert alert-danger py-2" *ngIf="errorGeneral">{{ errorGeneral }}</div>
+
+  <form [formGroup]="form" novalidate>
+    <div class="form-group">
+      <label for="equipoId">Equipo *</label>
+      <select id="equipoId" class="form-control" formControlName="equipoId"
+              [class.is-invalid]="form.get('equipoId')?.invalid && form.get('equipoId')?.touched">
+        <option [ngValue]="null" disabled>{{ cargandoEquipos ? 'Cargando equipos...' : 'Selecciona un equipo' }}</option>
+        <option *ngFor="let e of equipos" [ngValue]="e.id">
+          {{ e.descripcionEquipo }} — {{ e.codigo || e.codigoTaller || 's/código' }}
+        </option>
+      </select>
+      <div class="invalid-feedback d-block" *ngIf="form.get('equipoId')?.invalid && form.get('equipoId')?.touched">
+        Selecciona el equipo.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="titulo">Título *</label>
+      <input id="titulo" type="text" class="form-control" formControlName="titulo" autofocus
+             placeholder="Ej: Cambio de aceite"
+             [class.is-invalid]="form.get('titulo')?.invalid && form.get('titulo')?.touched" />
+      <div class="invalid-feedback d-block" *ngIf="form.get('titulo')?.invalid && form.get('titulo')?.touched">
+        El título es obligatorio.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="descripcion">Descripción (opcional)</label>
+      <textarea id="descripcion" class="form-control" formControlName="descripcion" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="fechaProgramada">Fecha programada *</label>
+      <input id="fechaProgramada" type="date" class="form-control" formControlName="fechaProgramada"
+             [class.is-invalid]="form.get('fechaProgramada')?.invalid && form.get('fechaProgramada')?.touched" />
+      <div class="invalid-feedback d-block" *ngIf="form.get('fechaProgramada')?.invalid && form.get('fechaProgramada')?.touched">
+        La fecha es obligatoria.
+      </div>
+    </div>
+
+    <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input" id="esRecurrente" formControlName="esRecurrente" />
+      <label class="form-check-label" for="esRecurrente">Repetir automáticamente al marcarlo como cumplido</label>
+    </div>
+
+    <div class="form-row" *ngIf="form.get('esRecurrente')?.value">
+      <div class="form-group col-6 mb-0">
+        <label for="intervaloRecurrenciaDias">Repetir cada (días)</label>
+        <input id="intervaloRecurrenciaDias" type="number" min="1" class="form-control" formControlName="intervaloRecurrenciaDias" />
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-brand" [disabled]="guardando" (click)="guardar()">
+    {{ guardando ? 'Guardando...' : 'Guardar' }}
+  </button>
+</div>

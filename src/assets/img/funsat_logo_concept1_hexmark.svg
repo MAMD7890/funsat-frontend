@@ -1,0 +1,45 @@
+<svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="hexGrad" x1="0" y1="0" x2="300" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#0B4F4A"/>
+    </linearGradient>
+    <symbol id="hexIcon" viewBox="0 0 300 300">
+      <polygon points="275,150 212.5,258.25 87.5,258.25 25,150 87.5,41.75 212.5,41.75" fill="url(#hexGrad)"/>
+      <polygon points="275,150 212.5,258.25 87.5,258.25 25,150 87.5,41.75 212.5,41.75" fill="none" stroke="#0B4F4A" stroke-width="3" opacity="0.4"/>
+      <circle cx="275" cy="150" r="6.5" fill="#F59E0B"/>
+      <circle cx="212.5" cy="258.25" r="6.5" fill="#F59E0B"/>
+      <circle cx="87.5" cy="258.25" r="6.5" fill="#F59E0B"/>
+      <circle cx="25" cy="150" r="6.5" fill="#F59E0B"/>
+      <circle cx="87.5" cy="41.75" r="6.5" fill="#F59E0B"/>
+      <circle cx="212.5" cy="41.75" r="6.5" fill="#F59E0B"/>
+      <text x="150" y="206" text-anchor="middle" font-size="150" font-weight="800" fill="#FFFFFF">F</text>
+    </symbol>
+  </defs>
+
+  <!-- Row 1: icon showcase -->
+  <rect x="0" y="0" width="500" height="280" fill="#F8FAFC"/>
+  <rect x="500" y="0" width="500" height="280" fill="#0B1220"/>
+  <use href="#hexIcon" x="160" y="40" width="180" height="180"/>
+  <use href="#hexIcon" x="660" y="40" width="180" height="180"/>
+
+  <!-- Row 2: full lockup -->
+  <rect x="0" y="280" width="500" height="280" fill="#FFFFFF"/>
+  <rect x="500" y="280" width="500" height="280" fill="#0F766E"/>
+
+  <use href="#hexIcon" x="60" y="345" width="130" height="130"/>
+  <text x="210" y="420" font-size="52" font-weight="800" letter-spacing="4" fill="#0B1220">FUNSAT</text>
+  <text x="212" y="448" font-size="14" font-weight="600" letter-spacing="3" fill="#F59E0B">SISTEMA DE INVENTARIO INDUSTRIAL</text>
+
+  <use href="#hexIcon" x="560" y="345" width="130" height="130"/>
+  <text x="710" y="420" font-size="52" font-weight="800" letter-spacing="4" fill="#FFFFFF">FUNSAT</text>
+  <text x="712" y="448" font-size="14" font-weight="600" letter-spacing="3" fill="#FDE68A">SISTEMA DE INVENTARIO INDUSTRIAL</text>
+
+  <!-- Footer: palette -->
+  <rect x="0" y="560" width="1000" height="80" fill="#F1F5F9"/>
+  <circle cx="60" cy="600" r="14" fill="#0F766E"/><text x="85" y="605" font-size="15" fill="#334155">#0F766E</text>
+  <circle cx="220" cy="600" r="14" fill="#14B8A6"/><text x="245" y="605" font-size="15" fill="#334155">#14B8A6</text>
+  <circle cx="380" cy="600" r="14" fill="#F59E0B"/><text x="405" y="605" font-size="15" fill="#334155">#F59E0B</text>
+  <circle cx="540" cy="600" r="14" fill="#0B1220"/><text x="565" y="605" font-size="15" fill="#334155">#0B1220</text>
+  <text x="720" y="605" font-size="14" fill="#64748B" font-style="italic">Concepto 1 — Marca hexagonal (industrial / técnica)</text>
+</svg>

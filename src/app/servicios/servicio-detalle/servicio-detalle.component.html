@@ -1,0 +1,94 @@
+<div class="empty-state surface-card" *ngIf="cargando">
+  <i class="fa fa-spinner fa-spin" style="font-size: 2rem;"></i>
+</div>
+
+<ng-container *ngIf="servicio as s">
+  <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+    <div>
+      <h2 class="mb-0">{{ tipoLabel[s.tipoServicio] }} &middot; {{ s.equipo.descripcionEquipo }}</h2>
+      <p class="text-muted-soft mb-0">
+        {{ s.fecha | date: 'd MMM y' }} &middot; {{ s.equipo.categoria.nombre }}
+      </p>
+    </div>
+    <div>
+      <button type="button" class="btn btn-outline-secondary mr-2" (click)="descargarPdf()">
+        <i class="fa fa-file-pdf mr-1"></i> Descargar PDF
+      </button>
+      <button type="button" class="btn btn-outline-secondary mr-2" (click)="editar()">
+        <i class="fa fa-pen mr-1"></i> Editar
+      </button>
+      <button class="btn btn-outline-danger" *ngIf="esAdmin" (click)="eliminar()">
+        <i class="fa fa-trash mr-1"></i> Eliminar
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="surface-card p-4 mb-3">
+        <h5 class="mb-3">Descripción del trabajo</h5>
+        <p style="white-space: pre-wrap;">{{ s.descripcion }}</p>
+      </div>
+
+      <div class="surface-card p-4 mb-3" *ngIf="s.repuestos.length > 0">
+        <h5 class="mb-3">Repuestos utilizados</h5>
+        <table class="table table-app mb-0">
+          <thead>
+            <tr>
+              <th>Repuesto</th>
+              <th class="text-right">Cantidad</th>
+              <th class="text-right">Costo unitario</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of s.repuestos">
+              <td>{{ r.nombre }}</td>
+              <td class="text-right">{{ r.cantidad }}</td>
+              <td class="text-right">{{ r.costoUnitario | cop }}</td>
+              <td class="text-right">{{ r.costoTotal | cop }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="text-right font-weight-bold">Total repuestos</td>
+              <td class="text-right font-weight-bold">{{ costoRepuestos | cop }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="surface-card p-4 mb-3" *ngIf="s.checklist.length > 0">
+        <h5 class="mb-3">Checklist</h5>
+        <div *ngFor="let c of s.checklist" class="checklist-row">
+          <div>
+            <i class="fa mr-2" [class.fa-check-square]="c.completado" [class.fa-square]="!c.completado"
+               [style.color]="c.completado ? 'var(--success)' : 'var(--text-muted)'"></i>
+            {{ c.nombreItem }}
+          </div>
+          <p class="text-muted-soft mb-0" style="font-size: .85rem;" *ngIf="c.observacion">{{ c.observacion }}</p>
+        </div>
+      </div>
+
+      <div class="surface-card p-4">
+        <app-evidencia-fotografica [servicioId]="s.id"></app-evidencia-fotografica>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="surface-card p-4">
+        <div class="text-muted-soft small">Técnico responsable</div>
+        <div class="mb-3">{{ s.tecnicoResponsable?.nombre || '—' }}</div>
+
+        <div class="text-muted-soft small">Costo valorizado</div>
+        <div class="mb-3">{{ s.costoValorizado | cop }}</div>
+
+        <div class="text-muted-soft small">Costo repuestos</div>
+        <div class="mb-3">{{ costoRepuestos | cop }}</div>
+
+        <div class="text-muted-soft small">Registrado</div>
+        <div>{{ s.creadoEn | date: 'd MMM y, HH:mm' }}</div>
+      </div>
+    </div>
+  </div>
+</ng-container>

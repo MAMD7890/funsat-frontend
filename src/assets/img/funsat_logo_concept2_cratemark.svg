@@ -1,0 +1,45 @@
+<svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="tealGrad2" x1="0" y1="0" x2="300" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#0F766E"/>
+    </linearGradient>
+    <symbol id="cubeIcon" viewBox="0 0 300 300">
+      <rect x="10" y="10" width="280" height="280" rx="70" fill="url(#tealGrad2)"/>
+      <polygon points="150,60 215,98 150,136 85,98" fill="#CCFBF1" stroke="#0B4F4A" stroke-width="3"/>
+      <polygon points="85,98 150,136 150,205 85,167" fill="#14B8A6" stroke="#0B4F4A" stroke-width="3"/>
+      <polygon points="150,136 215,98 215,167 150,205" fill="#0B4F4A" stroke="#0B4F4A" stroke-width="3"/>
+      <circle cx="215" cy="205" r="38" fill="#F59E0B" stroke="#FFFFFF" stroke-width="4"/>
+      <rect x="196" y="200" width="38" height="9" rx="4.5" fill="#FFFFFF" transform="rotate(45 215 205)"/>
+      <rect x="196" y="200" width="38" height="9" rx="4.5" fill="#FFFFFF" transform="rotate(-45 215 205)"/>
+    </symbol>
+  </defs>
+
+  <!-- Row 1: icon showcase -->
+  <rect x="0" y="0" width="500" height="280" fill="#F8FAFC"/>
+  <rect x="500" y="0" width="500" height="280" fill="#0B1220"/>
+  <use href="#cubeIcon" x="160" y="40" width="180" height="180"/>
+  <use href="#cubeIcon" x="660" y="40" width="180" height="180"/>
+
+  <!-- Row 2: full lockup -->
+  <rect x="0" y="280" width="500" height="280" fill="#FFFFFF"/>
+  <rect x="500" y="280" width="500" height="280" fill="#0F766E"/>
+
+  <use href="#cubeIcon" x="60" y="345" width="130" height="130"/>
+  <text x="210" y="420" font-size="52" font-weight="800" fill="#0B1220">funsat</text>
+  <rect x="212" y="432" width="150" height="6" rx="3" fill="#F59E0B"/>
+  <text x="212" y="460" font-size="14" font-weight="600" fill="#64748B">gestión de equipos e inventario</text>
+
+  <use href="#cubeIcon" x="560" y="345" width="130" height="130"/>
+  <text x="710" y="420" font-size="52" font-weight="800" fill="#FFFFFF">funsat</text>
+  <rect x="712" y="432" width="150" height="6" rx="3" fill="#F59E0B"/>
+  <text x="712" y="460" font-size="14" font-weight="600" fill="#99F6E4">gestión de equipos e inventario</text>
+
+  <!-- Footer: palette -->
+  <rect x="0" y="560" width="1000" height="80" fill="#F1F5F9"/>
+  <circle cx="60" cy="600" r="14" fill="#0F766E"/><text x="85" y="605" font-size="15" fill="#334155">#0F766E</text>
+  <circle cx="220" cy="600" r="14" fill="#14B8A6"/><text x="245" y="605" font-size="15" fill="#334155">#14B8A6</text>
+  <circle cx="380" cy="600" r="14" fill="#F59E0B"/><text x="405" y="605" font-size="15" fill="#334155">#F59E0B</text>
+  <circle cx="540" cy="600" r="14" fill="#0B1220"/><text x="565" y="605" font-size="15" fill="#334155">#0B1220</text>
+  <text x="720" y="605" font-size="14" fill="#64748B" font-style="italic">Concepto 2 — Marca de caja/herramientas (cercana / SaaS)</text>
+</svg>

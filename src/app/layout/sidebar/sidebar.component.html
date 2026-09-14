@@ -1,0 +1,38 @@
+<aside class="app-sidebar" [class.open]="abierto">
+  <div class="brand">
+    <img src="assets/img/funsat_icon_concept1.svg" alt="FUNSAT" class="brand-icon" />
+    <span>FUNSAT</span>
+  </div>
+
+  <nav class="app-sidebar-nav">
+    <ng-container *ngFor="let item of itemsPrincipales">
+      <a
+        class="nav-link"
+        [class.disabled]="!item.disponible"
+        [routerLink]="item.disponible ? item.ruta : null"
+        routerLinkActive="active"
+        (click)="cerrar.emit()"
+      >
+        <i class="fa {{ item.icono }} icon"></i>
+        <span>{{ item.etiqueta }}</span>
+        <span class="soon-badge" *ngIf="!item.disponible">Pronto</span>
+      </a>
+    </ng-container>
+
+    <ng-container *ngIf="esAdmin">
+      <div class="nav-section-label">Administración</div>
+      <a
+        class="nav-link"
+        *ngFor="let item of itemsAdmin"
+        [class.disabled]="!item.disponible"
+        [routerLink]="item.disponible ? item.ruta : null"
+        routerLinkActive="active"
+        (click)="cerrar.emit()"
+      >
+        <i class="fa {{ item.icono }} icon"></i>
+        <span>{{ item.etiqueta }}</span>
+        <span class="soon-badge" *ngIf="!item.disponible">Pronto</span>
+      </a>
+    </ng-container>
+  </nav>
+</aside>

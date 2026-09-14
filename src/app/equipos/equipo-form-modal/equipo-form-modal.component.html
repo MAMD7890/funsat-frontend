@@ -1,0 +1,201 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ esEdicion ? 'Editar equipo' : 'Nuevo equipo' }}</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss()">
+    <span>&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="empty-state" *ngIf="cargando">
+    <i class="fa fa-spinner fa-spin" style="font-size: 2rem;"></i>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate *ngIf="!cargando">
+    <div class="alert alert-danger py-2" *ngIf="errorGeneral">{{ errorGeneral }}</div>
+
+    <div class="surface-card p-3 mb-3">
+      <h6 class="mb-3">Información general</h6>
+      <div class="form-row">
+        <div class="form-group col-md-8">
+          <label>Descripción del equipo *</label>
+          <input type="text" class="form-control" formControlName="descripcionEquipo" placeholder='Ej: Pulidora 7"' />
+          <div class="invalid-feedback d-block" *ngIf="form.get('descripcionEquipo')?.invalid && form.get('descripcionEquipo')?.touched">
+            La descripción es obligatoria.
+          </div>
+        </div>
+        <div class="form-group col-md-4">
+          <label>Categoría *</label>
+          <select class="form-control" formControlName="categoriaId">
+            <option *ngFor="let c of categorias" [ngValue]="c.id">{{ c.nombre }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label>Código</label>
+          <input type="text" class="form-control" formControlName="codigo" placeholder="Ej: 117001" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>Marca</label>
+          <input type="text" class="form-control" formControlName="marca" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>Modelo</label>
+          <input type="text" class="form-control" formControlName="modelo" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>
+            Número de serie
+            <span class="text-danger" *ngIf="form.errors?.['numeroSerieRequerido']">*</span>
+          </label>
+          <input type="text" class="form-control" formControlName="numeroSerie"
+                 [class.is-invalid]="form.errors?.['numeroSerieRequerido'] && form.touched" />
+          <div class="invalid-feedback d-block" *ngIf="form.errors?.['numeroSerieRequerido'] && form.touched">
+            Obligatorio para esta categoría.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Motor</label>
+          <select class="form-control" formControlName="motorId">
+            <option [ngValue]="null">—</option>
+            <option *ngFor="let m of motores" [ngValue]="m.id">{{ m.nombre }}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label>Ubicación</label>
+          <input type="text" class="form-control" formControlName="ubicacion" placeholder="Ej: Almacén ASETPOR" />
+        </div>
+        <div class="form-group col-md-4 mb-0">
+          <label>Estado</label>
+          <select class="form-control" formControlName="estado">
+            <option *ngFor="let e of estados" [value]="e">{{ estadoLabel[e] }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface-card p-3 mb-3">
+      <h6 class="mb-3">Propiedad</h6>
+      <div class="form-row">
+        <div class="form-group col-md-4 mb-0">
+          <select class="form-control" formControlName="propiedad" (change)="onPropiedadChange()">
+            <option value="PROPIO">Propio</option>
+            <option value="EXTERNO">Externo (cliente de taller)</option>
+          </select>
+        </div>
+      </div>
+
+      <ng-container *ngIf="esExterno">
+        <div class="form-row mt-3">
+          <div class="form-group col-md-4">
+            <label>
+              Cliente <span class="text-danger" *ngIf="form.errors?.['clienteRequerido']">*</span>
+            </label>
+            <select class="form-control" formControlName="clienteId"
+                    [class.is-invalid]="form.errors?.['clienteRequerido'] && form.touched">
+              <option [ngValue]="null">Seleccione...</option>
+              <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nombre }}</option>
+            </select>
+            <div class="invalid-feedback d-block" *ngIf="form.errors?.['clienteRequerido'] && form.touched">
+              El cliente es obligatorio para equipos externos.
+            </div>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Código de taller</label>
+            <input type="text" class="form-control" formControlName="codigoTaller" placeholder="Ej: 26-MS-01" />
+          </div>
+          <div class="form-group col-md-4">
+            <label>Estado del servicio en taller</label>
+            <select class="form-control" formControlName="estadoServicioTaller">
+              <option [ngValue]="null">—</option>
+              <option *ngFor="let e of estadosServicioTaller" [value]="e">{{ estadoServicioTallerLabel[e] }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>
+              Fecha de ingreso <span class="text-danger" *ngIf="form.errors?.['fechaIngresoRequerida']">*</span>
+            </label>
+            <input type="date" class="form-control" formControlName="fechaIngreso"
+                   [class.is-invalid]="form.errors?.['fechaIngresoRequerida'] && form.touched" />
+            <div class="invalid-feedback d-block" *ngIf="form.errors?.['fechaIngresoRequerida'] && form.touched">
+              Obligatoria para equipos externos.
+            </div>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Fecha de diagnóstico</label>
+            <input type="date" class="form-control" formControlName="fechaDiagnostico" />
+          </div>
+          <div class="form-group col-md-4 form-check align-self-center mt-4">
+            <input type="checkbox" class="form-check-input" id="rotulado" formControlName="rotulado" />
+            <label class="form-check-label" for="rotulado">Rotulado</label>
+          </div>
+        </div>
+
+        <div class="form-group mb-0">
+          <label>Notas de accesorios (texto libre)</label>
+          <textarea class="form-control" formControlName="accesorios" rows="2" placeholder="Ej: Sin protector, completa..."></textarea>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="surface-card p-3 mb-3">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h6 class="mb-0">Accesorios del equipo</h6>
+          <p class="text-muted-soft mb-0" style="font-size: .78rem;">
+            Se podrán elegir individualmente al generar una orden de salida.
+          </p>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="agregarAccesorio()">
+          <i class="fa fa-plus mr-1"></i> Agregar accesorio
+        </button>
+      </div>
+
+      <div class="table-responsive" *ngIf="accesoriosFilas.length > 0">
+        <table class="table table-app mb-0">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th style="width: 120px;">Cantidad</th>
+              <th style="width: 50px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fila of accesoriosFilas; let i = index">
+              <td>
+                <input type="text" class="form-control" placeholder="Ej: Batería 20V"
+                       [(ngModel)]="fila.nombre" [ngModelOptions]="{standalone: true}" />
+              </td>
+              <td>
+                <input type="number" min="1" class="form-control" [(ngModel)]="fila.cantidad" [ngModelOptions]="{standalone: true}" />
+              </td>
+              <td class="text-right">
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="quitarAccesorio(i)">
+                  <i class="fa fa-times"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-muted-soft mb-0" style="font-size: .85rem;" *ngIf="accesoriosFilas.length === 0">
+        Este equipo no tiene accesorios registrados todavía.
+      </p>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer" *ngIf="!cargando">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-brand" [disabled]="guardando" (click)="guardar()">
+    {{ guardando ? 'Guardando...' : 'Guardar' }}
+  </button>
+</div>

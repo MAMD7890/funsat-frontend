@@ -1,0 +1,128 @@
+<div class="mb-3">
+  <h2 class="mb-0">Catálogos de equipo</h2>
+  <p class="text-muted-soft mb-0">Categorías y tipos de motor disponibles al registrar un equipo</p>
+</div>
+
+<div class="row">
+  <div class="col-lg-6 mb-4">
+    <div class="surface-card p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="mb-0">Categorías</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nuevaCategoria()">
+          <i class="fa fa-plus mr-1"></i> Nueva categoría
+        </button>
+      </div>
+
+      <div class="empty-state" *ngIf="cargandoCategorias">
+        <i class="fa fa-spinner fa-spin" style="font-size: 1.5rem;"></i>
+      </div>
+
+      <div class="table-responsive" *ngIf="!cargandoCategorias">
+        <table class="table table-app mb-0">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>N° serie</th>
+              <th>Estado</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of categorias">
+              <td class="font-weight-bold">{{ c.nombre }}</td>
+              <td>
+                <i class="fa" [class.fa-check]="c.requiereNumeroSerie" [class.text-muted-soft]="!c.requiereNumeroSerie"></i>
+              </td>
+              <td>
+                <span class="badge" [class.badge-success]="c.activo" [class.badge-secondary]="!c.activo">
+                  {{ c.activo ? 'Activa' : 'Inactiva' }}
+                </span>
+              </td>
+              <td class="text-right">
+                <div class="table-actions">
+                  <button type="button" class="table-action-btn" (click)="editarCategoria(c)" title="Editar">
+                    <i class="fa fa-pen"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="table-action-btn"
+                    [class.table-action-danger]="c.activo"
+                    [class.table-action-success]="!c.activo"
+                    (click)="alternarActivaCategoria(c)"
+                    [title]="c.activo ? 'Desactivar' : 'Activar'"
+                  >
+                    <i class="fa" [class.fa-ban]="c.activo" [class.fa-check-circle]="!c.activo"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="empty-state" *ngIf="categorias.length === 0">
+          <i class="fa fa-tags mb-2" style="font-size: 1.6rem;"></i>
+          <p class="mb-0">Todavía no hay categorías registradas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 mb-4">
+    <div class="surface-card p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="mb-0">Tipos de motor</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="nuevoMotor()">
+          <i class="fa fa-plus mr-1"></i> Nuevo tipo de motor
+        </button>
+      </div>
+
+      <div class="empty-state" *ngIf="cargandoMotores">
+        <i class="fa fa-spinner fa-spin" style="font-size: 1.5rem;"></i>
+      </div>
+
+      <div class="table-responsive" *ngIf="!cargandoMotores">
+        <table class="table table-app mb-0">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Estado</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of motores">
+              <td class="font-weight-bold">{{ m.nombre }}</td>
+              <td>
+                <span class="badge" [class.badge-success]="m.activo" [class.badge-secondary]="!m.activo">
+                  {{ m.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="text-right">
+                <div class="table-actions">
+                  <button type="button" class="table-action-btn" (click)="editarMotor(m)" title="Editar">
+                    <i class="fa fa-pen"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="table-action-btn"
+                    [class.table-action-danger]="m.activo"
+                    [class.table-action-success]="!m.activo"
+                    (click)="alternarActivoMotor(m)"
+                    [title]="m.activo ? 'Desactivar' : 'Activar'"
+                  >
+                    <i class="fa" [class.fa-ban]="m.activo" [class.fa-check-circle]="!m.activo"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="empty-state" *ngIf="motores.length === 0">
+          <i class="fa fa-cog mb-2" style="font-size: 1.6rem;"></i>
+          <p class="mb-0">Todavía no hay tipos de motor registrados.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

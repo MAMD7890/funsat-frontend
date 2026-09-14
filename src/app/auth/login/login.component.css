@@ -1,0 +1,4 @@
+/* Estilos compartidos de las páginas de auth (login, cambiar contraseña)
+   viven en src/assets/css/theme.css (global) porque Angular encapsula el
+   CSS de un componente y ChangePasswordComponent reutiliza estas mismas
+   clases. */

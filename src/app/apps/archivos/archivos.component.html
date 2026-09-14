@@ -1,0 +1,26 @@
+<div class="mb-4">
+  <h2 class="mb-0">File Manager</h2>
+  <p class="text-muted-soft mb-0">Vista de demostración — carpetas locales, sin conexión al backend</p>
+</div>
+
+<div class="surface-card p-4">
+  <nav class="breadcrumb-files mb-3">
+    <span *ngFor="let item of ruta; let i = index; let last = last">
+      <a href="javascript:void(0)" (click)="irA(i)" [class.active]="last">{{ item.nombre }}</a>
+      <i class="fa fa-chevron-right mx-2" style="font-size: .65rem;" *ngIf="!last"></i>
+    </span>
+  </nav>
+
+  <div class="file-grid">
+    <div class="file-item" *ngFor="let item of carpetaActual.hijos" (click)="abrir(item)">
+      <i class="fa" [class]="icono(item.tipo)" [class.text-carpeta]="item.tipo === 'carpeta'"></i>
+      <div class="file-item-nombre">{{ item.nombre }}</div>
+      <div class="file-item-tamano" *ngIf="item.tamano">{{ item.tamano }}</div>
+    </div>
+
+    <div class="empty-state" *ngIf="!carpetaActual.hijos || carpetaActual.hijos.length === 0">
+      <i class="fa fa-inbox mb-2" style="font-size: 2rem;"></i>
+      <p class="mb-0">Esta carpeta está vacía.</p>
+    </div>
+  </div>
+</div>

@@ -1,63 +1,129 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { CommonModule, } from '@angular/common';
-import { BrowserModule  } from '@angular/platform-browser';
 import { Routes, RouterModule } from '@angular/router';
 
-import { LoginComponent } from './login/login.component';
-import { LayoutComponent } from './layout/layout.component';
-import { ProductsComponent } from './products/products.component';
-import { ImportProductosComponent } from './products/import-productos.component';
-import { PaymentMethodsComponent } from './payment-methods/payment-methods.component';
-import { SaleRegisterComponent } from './sales/sale-register.component';
-import { SaleHistoryComponent } from './sales/sale-history.component';
-import { CashRegisterComponent } from './cash-register/cash-register.component';
-import { CashRegisterHistoryComponent } from './cash-register/cash-register-history.component';
-import { CustomersComponent } from './customers/customers.component';
-import { CreditsComponent } from './credits/credits.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { ReportsComponent } from './reports/reports.component';
-import { UsersComponent } from './users/users.component';
-import { ExternalInvoicesComponent } from './external-invoices/external-invoices.component';
-import { AuthGuard } from './services/auth.guard';
+import { AuthGuard } from './core/guards/auth.guard';
+import { RoleGuard } from './core/guards/role.guard';
 
-const routes: Routes =[
+import { LoginComponent } from './auth/login/login.component';
+import { ChangePasswordComponent } from './auth/change-password/change-password.component';
+import { LayoutComponent } from './layout/layout.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ComingSoonComponent } from './shared/coming-soon/coming-soon.component';
+import { NoAutorizadoComponent } from './shared/no-autorizado/no-autorizado.component';
+
+import { EquipoListadoComponent } from './equipos/equipo-listado/equipo-listado.component';
+import { EquipoDetalleComponent } from './equipos/equipo-detalle/equipo-detalle.component';
+
+import { ClienteListadoComponent } from './clientes/cliente-listado/cliente-listado.component';
+
+import { RepuestoListadoComponent } from './repuestos/repuesto-listado/repuesto-listado.component';
+import { ChecklistListadoComponent } from './checklist/checklist-listado/checklist-listado.component';
+
+import { ServicioListadoComponent } from './servicios/servicio-listado/servicio-listado.component';
+import { ServicioDetalleComponent } from './servicios/servicio-detalle/servicio-detalle.component';
+
+import { ImportacionComponent } from './importacion/importacion.component';
+
+import { RolesComponent } from './roles/roles.component';
+
+import { UsuarioListadoComponent } from './usuarios/usuario-listado/usuario-listado.component';
+
+import { AuditoriaListadoComponent } from './auditoria/auditoria-listado/auditoria-listado.component';
+
+import { ReportesComponent } from './reportes/reportes.component';
+
+import { CatalogosComponent } from './catalogos/catalogos.component';
+
+import { PerfilComponent } from './perfil/perfil.component';
+
+import { OrdenListadoComponent } from './movimientos/orden-listado/orden-listado.component';
+import { OrdenDetalleComponent } from './movimientos/orden-detalle/orden-detalle.component';
+
+import { KanbanComponent } from './apps/kanban/kanban.component';
+import { ChatComponent } from './apps/chat/chat.component';
+import { CalendarioComponent } from './apps/calendario/calendario.component';
+import { ArchivosComponent } from './apps/archivos/archivos.component';
+
+const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'cambiar-password', component: ChangePasswordComponent, canActivate: [AuthGuard] },
+  { path: 'no-autorizado', component: NoAutorizadoComponent },
+
   {
     path: '',
     component: LayoutComponent,
     canActivate: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'products', component: ProductsComponent },
-      { path: 'products/import', component: ImportProductosComponent },
-      { path: 'payment-methods', component: PaymentMethodsComponent },
-      { path: 'sales/register', component: SaleRegisterComponent },
-      { path: 'sales/history', component: SaleHistoryComponent },
-      { path: 'caja', component: CashRegisterComponent },
-      { path: 'caja/historial', component: CashRegisterHistoryComponent },
-      { path: 'customers', component: CustomersComponent },
-      { path: 'credits', component: CreditsComponent },
-      { path: 'reports', component: ReportsComponent },
-      { path: 'users', component: UsersComponent },
-      { path: 'external-invoices', component: ExternalInvoicesComponent },
-      { path: 'vender', redirectTo: '/sales/register', pathMatch: 'full' },
-      { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
+      { path: 'perfil', component: PerfilComponent },
+
+      { path: 'equipos', component: EquipoListadoComponent },
+      { path: 'equipos/:id', component: EquipoDetalleComponent },
+
+      { path: 'clientes', component: ClienteListadoComponent },
+
+      { path: 'servicios', component: ServicioListadoComponent },
+      { path: 'servicios/:id', component: ServicioDetalleComponent },
+
+      { path: 'reportes', component: ReportesComponent },
+
+      { path: 'repuestos', component: RepuestoListadoComponent },
+      { path: 'checklist', component: ChecklistListadoComponent },
+
+      { path: 'movimientos', component: OrdenListadoComponent },
+      { path: 'movimientos/:id', component: OrdenDetalleComponent },
+
+      {
+        path: 'importacion',
+        component: ImportacionComponent,
+        data: { roles: ['ADMIN'] },
+        canActivate: [RoleGuard]
+      },
+
+      {
+        path: 'usuarios',
+        component: UsuarioListadoComponent,
+        data: { roles: ['ADMIN'] },
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'roles',
+        component: RolesComponent,
+        data: { roles: ['ADMIN'] },
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'auditoria',
+        component: AuditoriaListadoComponent,
+        data: { roles: ['ADMIN'] },
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'catalogos',
+        component: CatalogosComponent,
+        data: { roles: ['ADMIN'] },
+        canActivate: [RoleGuard]
+      },
+
+      { path: 'apps/calendario', component: CalendarioComponent },
+      { path: 'apps/kanban', component: KanbanComponent },
+      { path: 'apps/chat', component: ChatComponent },
+      { path: 'apps/archivos', component: ArchivosComponent },
+
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-  {
-    path: '**',
-    redirectTo: '/',
-    pathMatch: 'full'
-  }
+
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     RouterModule.forRoot(routes)
   ],
-  exports: [
-  ],
+  exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}

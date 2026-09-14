@@ -1,0 +1,49 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ esEdicion ? 'Editar cliente' : 'Nuevo cliente' }}</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss()">
+    <span>&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="alert alert-danger py-2" *ngIf="errorGeneral">{{ errorGeneral }}</div>
+
+  <form [formGroup]="form" novalidate>
+    <div class="form-group">
+      <label for="nombre">Nombre *</label>
+      <input id="nombre" type="text" class="form-control" formControlName="nombre" autofocus
+             [class.is-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched" />
+      <div class="invalid-feedback d-block" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">
+        El nombre es obligatorio.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="tipo">Tipo</label>
+      <select id="tipo" class="form-control" formControlName="tipo">
+        <option value="NATURAL">Natural</option>
+        <option value="EMPRESA">Empresa</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="telefono">Teléfono</label>
+      <input id="telefono" type="text" class="form-control" formControlName="telefono" />
+    </div>
+
+    <div class="form-group mb-0">
+      <label for="email">Email</label>
+      <input id="email" type="email" class="form-control" formControlName="email" />
+      <div class="invalid-feedback d-block" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+        El email no tiene un formato válido.
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-brand" [disabled]="guardando" (click)="guardar()">
+    {{ guardando ? 'Guardando...' : 'Guardar' }}
+  </button>
+</div>

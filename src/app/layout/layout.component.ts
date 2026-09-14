@@ -1,33 +1,17 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { routeFadeAnimation } from '../core/animations/route-animations';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.css']
+  animations: [routeFadeAnimation]
 })
-export class LayoutComponent implements OnInit {
-  sidebarOpen = true;
+export class LayoutComponent {
 
-  constructor() { }
+  sidebarAbierto = false;
+  anioActual = new Date().getFullYear();
 
-  ngOnInit(): void {
-    this.syncSidebarByViewport();
-  }
-
-  @HostListener('window:resize')
-  onResize(): void {
-    this.syncSidebarByViewport();
-  }
-
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
-
-  private syncSidebarByViewport(): void {
-    if (window.innerWidth <= 768) {
-      this.sidebarOpen = false;
-    } else {
-      this.sidebarOpen = true;
-    }
+  toggleSidebar(): void {
+    this.sidebarAbierto = !this.sidebarAbierto;
   }
 }

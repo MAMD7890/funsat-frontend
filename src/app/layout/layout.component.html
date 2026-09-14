@@ -1,11 +1,10 @@
+<app-sidebar [abierto]="sidebarAbierto" (cerrar)="sidebarAbierto = false"></app-sidebar>
 <app-navbar (toggleSidebar)="toggleSidebar()"></app-navbar>
 
-<div class="app-layout">
-  <app-sidebar [isOpen]="sidebarOpen" (toggleSidebar)="toggleSidebar()"></app-sidebar>
-  
-  <div class="main-content" [class.sidebar-closed]="!sidebarOpen">
-    <div class="content-area">
-      <router-outlet></router-outlet>
-    </div>
-  </div>
-</div>
+<main class="app-content" [@routeAnimations]="o.isActivated ? o.activatedRoute : ''">
+  <router-outlet #o="outlet"></router-outlet>
+
+  <p class="footer-note text-muted-soft text-center mt-4 mb-0">
+    &copy; {{ anioActual }} FUNSAT &middot; Miguel Mosquera Ingeniero
+  </p>
+</main>

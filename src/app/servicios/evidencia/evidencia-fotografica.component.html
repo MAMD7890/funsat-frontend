@@ -1,0 +1,51 @@
+<h5 class="mb-3">Evidencia fotográfica</h5>
+
+<div class="upload-row mb-4">
+  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" (change)="onArchivoSeleccionado($event)" #fileInput />
+  <select class="form-control" [(ngModel)]="tipoEvidencia" style="max-width: 140px;">
+    <option value="ANTES">Antes</option>
+    <option value="DESPUES">Después</option>
+  </select>
+  <input type="text" class="form-control" placeholder="Descripción (opcional)" [(ngModel)]="descripcion" style="max-width: 220px;" />
+  <button type="button" class="btn btn-brand" [disabled]="subiendo || !archivoSeleccionado" (click)="subir()">
+    <i class="fa fa-upload mr-1"></i> {{ subiendo ? 'Subiendo...' : 'Subir' }}
+  </button>
+</div>
+
+<div class="empty-state" *ngIf="cargando">
+  <i class="fa fa-spinner fa-spin" style="font-size: 1.5rem;"></i>
+</div>
+
+<ng-container *ngIf="!cargando">
+  <div class="mb-4">
+    <h6 class="text-muted-soft">Antes ({{ antes.length }})</h6>
+    <div class="evidencia-grid" *ngIf="antes.length > 0; else sinAntes">
+      <div class="evidencia-thumb" *ngFor="let v of antes">
+        <img *ngIf="v.safeUrl" [src]="v.safeUrl" (click)="verGrande(v)" alt="Evidencia antes" />
+        <div class="evidencia-thumb-loading" *ngIf="!v.safeUrl"><i class="fa fa-spinner fa-spin"></i></div>
+        <button type="button" class="evidencia-thumb-delete" *ngIf="esAdmin" (click)="eliminar(v)" title="Eliminar">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    </div>
+    <ng-template #sinAntes>
+      <p class="text-muted-soft mb-0" style="font-size: .85rem;">Sin fotos "antes" todavía.</p>
+    </ng-template>
+  </div>
+
+  <div>
+    <h6 class="text-muted-soft">Después ({{ despues.length }})</h6>
+    <div class="evidencia-grid" *ngIf="despues.length > 0; else sinDespues">
+      <div class="evidencia-thumb" *ngFor="let v of despues">
+        <img *ngIf="v.safeUrl" [src]="v.safeUrl" (click)="verGrande(v)" alt="Evidencia después" />
+        <div class="evidencia-thumb-loading" *ngIf="!v.safeUrl"><i class="fa fa-spinner fa-spin"></i></div>
+        <button type="button" class="evidencia-thumb-delete" *ngIf="esAdmin" (click)="eliminar(v)" title="Eliminar">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    </div>
+    <ng-template #sinDespues>
+      <p class="text-muted-soft mb-0" style="font-size: .85rem;">Sin fotos "después" todavía.</p>
+    </ng-template>
+  </div>
+</ng-container>

@@ -1,0 +1,136 @@
+<div class="empty-state surface-card" *ngIf="cargando">
+  <i class="fa fa-spinner fa-spin" style="font-size: 2rem;"></i>
+</div>
+
+<ng-container *ngIf="equipo as e">
+  <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+    <div>
+      <h2 class="mb-0">{{ e.descripcionEquipo }}</h2>
+      <p class="text-muted-soft mb-0">
+        {{ e.codigo || e.codigoTaller || 'Sin código' }} &middot; {{ e.categoria.nombre }}
+      </p>
+    </div>
+    <div>
+      <a class="btn btn-outline-secondary mr-2" [routerLink]="['/servicios']" [queryParams]="{ equipoId: e.id }">
+        <i class="fa fa-wrench mr-1"></i> Historial de servicios
+      </a>
+      <button type="button" class="btn btn-outline-secondary mr-2" (click)="editar()">
+        <i class="fa fa-pen mr-1"></i> Editar
+      </button>
+      <button class="btn btn-outline-danger" *ngIf="esAdmin" (click)="eliminar()">
+        <i class="fa fa-trash mr-1"></i> Eliminar
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="surface-card p-4 mb-3">
+        <h5 class="mb-3">Información general</h5>
+        <div class="row">
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Marca</div>
+            <div>{{ e.marca || '—' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Modelo</div>
+            <div>{{ e.modelo || '—' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Número de serie</div>
+            <div>{{ e.numeroSerie || '—' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Motor</div>
+            <div>{{ e.motor?.nombre || '—' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Ubicación actual</div>
+            <div>
+              <i class="fa mr-1" [class.fa-truck]="e.enCalle" [class.fa-map-marker-alt]="!e.enCalle" [class.text-info]="e.enCalle"></i>
+              {{ e.ubicacionActual || '—' }}
+              <span class="badge badge-info ml-1" *ngIf="e.enCalle">En la calle</span>
+            </div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Fecha de registro</div>
+            <div>{{ e.fechaRegistro | date: 'd MMM y' }}</div>
+          </div>
+        </div>
+
+        <div class="d-flex" style="gap: 1.5rem;">
+          <span><i class="fa mr-1" [class.fa-check-square]="e.checkMtto" [class.fa-square]="!e.checkMtto"></i> Check Mtto</span>
+          <span><i class="fa mr-1" [class.fa-check-square]="e.checkHv" [class.fa-square]="!e.checkHv"></i> Check HV</span>
+          <span><i class="fa mr-1" [class.fa-check-square]="e.checkFt" [class.fa-square]="!e.checkFt"></i> Check FT</span>
+        </div>
+      </div>
+
+      <div class="surface-card p-4 mb-3" *ngIf="e.accesoriosRegistrados.length > 0">
+        <h5 class="mb-3">Accesorios registrados</h5>
+        <ul class="mb-0 pl-3">
+          <li *ngFor="let a of e.accesoriosRegistrados">
+            {{ a.nombre }}<span *ngIf="a.cantidad > 1"> (x{{ a.cantidad }})</span>
+            <span class="text-muted-soft small ml-1">
+              <i class="fa mr-1" [class.fa-truck]="a.enCalle" [class.fa-map-marker-alt]="!a.enCalle"></i>{{ a.ubicacionActual || '—' }}
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="surface-card p-4" *ngIf="e.propiedad === 'EXTERNO'">
+        <h5 class="mb-3">Servicio de taller</h5>
+        <div class="row">
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Cliente</div>
+            <div>{{ e.cliente?.nombre || '—' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Código de taller</div>
+            <div>{{ e.codigoTaller || '—' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Estado del servicio</div>
+            <div>{{ e.estadoServicioTaller ? estadoServicioTallerLabel[e.estadoServicioTaller] : '—' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Rotulado</div>
+            <div>{{ e.rotulado ? 'Sí' : 'No' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Fecha de ingreso</div>
+            <div>{{ e.fechaIngreso ? (e.fechaIngreso | date: 'd MMM y') : '—' }}</div>
+          </div>
+          <div class="col-6 mb-3">
+            <div class="text-muted-soft small">Fecha de diagnóstico</div>
+            <div>{{ e.fechaDiagnostico ? (e.fechaDiagnostico | date: 'd MMM y') : '—' }}</div>
+          </div>
+          <div class="col-12">
+            <div class="text-muted-soft small">Accesorios</div>
+            <div>{{ e.accesorios || '—' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="surface-card p-4 mt-3">
+        <app-documento-equipo [equipoId]="e.id"></app-documento-equipo>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="surface-card p-4">
+        <h5 class="mb-3">Estado</h5>
+        <span class="badge mb-3"
+              [class.badge-success]="e.estado === 'ACTIVO'"
+              [class.badge-secondary]="e.estado === 'INACTIVO' || e.estado === 'DADO_DE_BAJA'"
+              [class.badge-warning]="e.estado === 'EN_MANTENIMIENTO'"
+              style="font-size: .85rem;">
+          {{ estadoLabel[e.estado] }}
+        </span>
+        <div class="text-muted-soft small">Propiedad</div>
+        <div class="mb-3">{{ propiedadLabel[e.propiedad] }}</div>
+        <div class="text-muted-soft small">Registrado</div>
+        <div>{{ e.creadoEn | date: 'd MMM y, HH:mm' }}</div>
+      </div>
+    </div>
+  </div>
+</ng-container>

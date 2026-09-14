@@ -1,0 +1,84 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+  <div>
+    <h2 class="mb-0">Movimientos de Equipos</h2>
+    <p class="text-muted-soft mb-0">Órdenes de salida y entrada de equipos prestados o alquilados a otras empresas</p>
+  </div>
+  <button type="button" class="btn btn-brand" (click)="nuevaOrden()">
+    <i class="fa fa-plus mr-1"></i> Nueva orden de salida
+  </button>
+</div>
+
+<div class="surface-card p-3 mb-3">
+  <div class="form-row align-items-end">
+    <div class="form-group col-md-3 mb-2">
+      <label class="small text-muted-soft mb-1">Desde</label>
+      <input type="date" class="form-control" [(ngModel)]="filtros.desde" />
+    </div>
+    <div class="form-group col-md-3 mb-2">
+      <label class="small text-muted-soft mb-1">Hasta</label>
+      <input type="date" class="form-control" [(ngModel)]="filtros.hasta" />
+    </div>
+    <div class="form-group col-md-3 mb-2">
+      <button type="button" class="btn btn-brand mr-2" (click)="aplicarFiltros()">Filtrar</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="surface-card p-3">
+  <div class="table-responsive">
+    <table class="table table-app mb-0">
+      <thead>
+        <tr>
+          <th>N° Orden</th>
+          <th>Fecha</th>
+          <th>Destino</th>
+          <th>Equipos</th>
+          <th>Estado</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let orden of page?.content">
+          <td class="font-weight-bold">
+            <a [routerLink]="['/movimientos', orden.id]">{{ orden.numero }}</a>
+          </td>
+          <td>{{ orden.fechaSalida | date: 'd MMM y' }}</td>
+          <td>{{ orden.cliente.nombre }}</td>
+          <td>{{ orden.items.length }}</td>
+          <td>
+            <span class="badge" [class.badge-warning]="orden.estado === 'ABIERTA'"
+                  [class.badge-info]="orden.estado === 'PARCIAL'"
+                  [class.badge-success]="orden.estado === 'CERRADA'">
+              {{ estadoLabel[orden.estado] }}
+            </span>
+          </td>
+          <td class="text-right">
+            <div class="table-actions">
+              <button type="button" class="table-action-btn" (click)="descargarPdf(orden)" title="Descargar PDF">
+                <i class="fa fa-file-pdf"></i>
+              </button>
+              <a class="table-action-btn" [routerLink]="['/movimientos', orden.id]" title="Ver detalle">
+                <i class="fa fa-eye"></i>
+              </a>
+              <button type="button" class="table-action-btn table-action-danger" *ngIf="esAdmin" (click)="eliminar(orden)" title="Eliminar">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="page && page.empty && !cargando">
+      <i class="fa fa-truck-loading mb-2" style="font-size: 2rem;"></i>
+      <p class="mb-0">Todavía no hay órdenes de salida registradas.</p>
+    </div>
+
+    <div class="empty-state" *ngIf="cargando">
+      <i class="fa fa-spinner fa-spin mb-2" style="font-size: 2rem;"></i>
+    </div>
+  </div>
+
+  <app-pagination [page]="page" (cambiarPagina)="cargar($event)"></app-pagination>
+</div>

@@ -1,0 +1,104 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+  <div>
+    <h2 class="mb-0">Equipos</h2>
+    <p class="text-muted-soft mb-0">Inventario de equipos propios y externos en taller</p>
+  </div>
+  <button type="button" class="btn btn-brand" (click)="nuevoEquipo()">
+    <i class="fa fa-plus mr-1"></i> Nuevo equipo
+  </button>
+</div>
+
+<div class="surface-card p-3 mb-3">
+  <div class="form-row align-items-end">
+    <div class="form-group col-md-3 mb-2">
+      <label class="small text-muted-soft mb-1">Categoría</label>
+      <select class="form-control" [(ngModel)]="filtros.categoriaId">
+        <option [ngValue]="null">Todas</option>
+        <option *ngFor="let c of categorias" [ngValue]="c.id">{{ c.nombre }}</option>
+      </select>
+    </div>
+    <div class="form-group col-md-3 mb-2">
+      <label class="small text-muted-soft mb-1">Estado</label>
+      <select class="form-control" [(ngModel)]="filtros.estado">
+        <option [ngValue]="null">Todos</option>
+        <option *ngFor="let e of estados" [ngValue]="e">{{ estadoLabel[e] }}</option>
+      </select>
+    </div>
+    <div class="form-group col-md-3 mb-2">
+      <label class="small text-muted-soft mb-1">Propiedad</label>
+      <select class="form-control" [(ngModel)]="filtros.propiedad">
+        <option [ngValue]="null">Todas</option>
+        <option [ngValue]="'PROPIO'">Propio</option>
+        <option [ngValue]="'EXTERNO'">Externo</option>
+      </select>
+    </div>
+    <div class="form-group col-md-3 mb-2 d-flex">
+      <button class="btn btn-brand mr-2" (click)="aplicarFiltros()">Filtrar</button>
+      <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="surface-card p-3">
+  <div class="table-responsive">
+    <table class="table table-app mb-0">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Descripción</th>
+          <th>Categoría</th>
+          <th>Marca</th>
+          <th>Estado</th>
+          <th>Propiedad</th>
+          <th>Cliente</th>
+          <th>Ubicación</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let equipo of page?.content" (click)="irADetalle(equipo)" style="cursor: pointer;">
+          <td>{{ equipo.codigo || equipo.codigoTaller || '—' }}</td>
+          <td class="font-weight-bold">{{ equipo.descripcionEquipo }}</td>
+          <td>{{ equipo.categoria.nombre }}</td>
+          <td>{{ equipo.marca || '—' }}</td>
+          <td>
+            <span class="badge"
+                  [class.badge-success]="equipo.estado === 'ACTIVO'"
+                  [class.badge-secondary]="equipo.estado === 'INACTIVO' || equipo.estado === 'DADO_DE_BAJA'"
+                  [class.badge-warning]="equipo.estado === 'EN_MANTENIMIENTO'">
+              {{ estadoLabel[equipo.estado] }}
+            </span>
+          </td>
+          <td>{{ propiedadLabel[equipo.propiedad] }}</td>
+          <td>{{ equipo.cliente?.nombre || '—' }}</td>
+          <td>
+            <span class="badge" [class.badge-info]="equipo.enCalle" [class.badge-light]="!equipo.enCalle" [title]="equipo.enCalle ? 'En la calle, con el cliente' : 'En ubicación de origen'">
+              <i class="fa mr-1" [class.fa-truck]="equipo.enCalle" [class.fa-map-marker-alt]="!equipo.enCalle"></i>{{ equipo.ubicacionActual || '—' }}
+            </span>
+          </td>
+          <td class="text-right" (click)="$event.stopPropagation()">
+            <div class="table-actions">
+              <button class="table-action-btn" (click)="irAEditar(equipo, $event)" title="Editar">
+                <i class="fa fa-pen"></i>
+              </button>
+              <button class="table-action-btn table-action-danger" *ngIf="esAdmin" (click)="eliminar(equipo, $event)" title="Eliminar">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="page && page.empty && !cargando">
+      <i class="fa fa-toolbox mb-2" style="font-size: 2rem;"></i>
+      <p class="mb-0">No hay equipos que coincidan con los filtros.</p>
+    </div>
+
+    <div class="empty-state" *ngIf="cargando">
+      <i class="fa fa-spinner fa-spin mb-2" style="font-size: 2rem;"></i>
+    </div>
+  </div>
+
+  <app-pagination [page]="page" (cambiarPagina)="cargar($event)"></app-pagination>
+</div>

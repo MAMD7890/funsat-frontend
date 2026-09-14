@@ -1,0 +1,67 @@
+<div class="modal-header">
+  <h5 class="modal-title">Recordatorios del {{ tituloFecha }}</h5>
+  <button type="button" class="close" (click)="cerrar()">
+    <span>&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-sm btn-brand" (click)="nuevoRecordatorio()">
+      <i class="fa fa-plus mr-1"></i> Agregar
+    </button>
+  </div>
+
+  <div class="empty-state" *ngIf="cargando">
+    <i class="fa fa-spinner fa-spin" style="font-size: 1.5rem;"></i>
+  </div>
+
+  <div class="table-responsive" *ngIf="!cargando && recordatorios.length > 0">
+    <table class="table table-app mb-0">
+      <thead>
+        <tr>
+          <th>Equipo</th>
+          <th>Título</th>
+          <th>Estado</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of recordatorios">
+          <td>
+            <div class="font-weight-bold">{{ r.equipoDescripcion }}</div>
+            <div class="text-muted-soft" style="font-size: .78rem;">{{ r.equipoCodigo || 's/código' }}</div>
+          </td>
+          <td>
+            {{ r.titulo }}
+            <div class="text-muted-soft" style="font-size: .78rem;" *ngIf="r.descripcion">{{ r.descripcion }}</div>
+            <i class="fa fa-sync-alt text-muted-soft ml-1" title="Se repite automáticamente" *ngIf="r.intervaloRecurrenciaDias"></i>
+          </td>
+          <td>
+            <span class="badge" [class.badge-danger]="claseEstado(r) === 'vencido'"
+                  [class.badge-warning]="claseEstado(r) === 'pendiente'"
+                  [class.badge-success]="claseEstado(r) === 'completado'">
+              {{ claseEstado(r) === 'vencido' ? 'Vencido' : (claseEstado(r) === 'pendiente' ? 'Pendiente' : 'Completado') }}
+            </span>
+          </td>
+          <td class="text-right">
+            <button type="button" class="btn btn-sm btn-outline-success mr-1" *ngIf="r.estado === 'PENDIENTE'"
+                    (click)="completarRecordatorio(r)" title="Marcar cumplido">
+              <i class="fa fa-check"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary mr-1" (click)="editarRecordatorio(r)" title="Editar">
+              <i class="fa fa-pen"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" *ngIf="esAdmin" (click)="eliminarRecordatorio(r)" title="Eliminar">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="text-muted-soft mb-0" style="font-size: .85rem;" *ngIf="!cargando && recordatorios.length === 0">
+    Sin recordatorios este día.
+  </p>
+</div>

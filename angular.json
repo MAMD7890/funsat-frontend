@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "folder-app": {
+    "sistema-inventario-equipos-frontend": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -22,11 +22,10 @@
               "src/favicon.ico"
             ],
             "styles": [
-              "node_modules/perfect-scrollbar/css/perfect-scrollbar.css",
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/ngx-toastr/toastr.css",
-              "src/assets/scss/now-ui-dashboard.scss",
-              "src/assets/demo/demo.css"
+              "src/assets/css/theme.css",
+              "src/styles.css"
             ],
             "scripts": [
               "node_modules/chart.js/dist/Chart.min.js"
@@ -61,15 +60,15 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "folder-app:build",
+            "browserTarget": "sistema-inventario-equipos-frontend:build",
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "browserTarget": "folder-app:build:production"
+              "browserTarget": "sistema-inventario-equipos-frontend:build:production"
             },
             "development": {
-              "browserTarget": "folder-app:build:development"
+              "browserTarget": "sistema-inventario-equipos-frontend:build:development"
             },
             "defaultConfiguration": "development"
           }
@@ -77,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "folder-app:build"
+            "browserTarget": "sistema-inventario-equipos-frontend:build"
           }
         },
         "test": {
@@ -91,10 +90,10 @@
               "node_modules/chart.js/dist/Chart.min.js"
             ],
             "styles": [
-              "node_modules/perfect-scrollbar/css/perfect-scrollbar.css",
+              "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/ngx-toastr/toastr.css",
-              "src/assets/scss/now-ui-dashboard.scss",
-              "src/assets/demo/demo.css"
+              "src/assets/css/theme.css",
+              "src/styles.css"
             ],
             "assets": [
               "src/assets",
@@ -138,7 +137,7 @@
       }
     }
   },
-  "defaultProject": "now-ui-dashboard-angular",
+  "defaultProject": "sistema-inventario-equipos-frontend",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",

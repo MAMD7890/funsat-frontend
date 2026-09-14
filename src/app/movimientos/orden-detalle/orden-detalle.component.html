@@ -1,0 +1,122 @@
+<div class="empty-state surface-card" *ngIf="cargando">
+  <i class="fa fa-spinner fa-spin" style="font-size: 2rem;"></i>
+</div>
+
+<ng-container *ngIf="orden as o">
+  <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+    <div>
+      <h2 class="mb-0">{{ o.numero }}</h2>
+      <p class="text-muted-soft mb-0">
+        {{ o.fechaSalida | date: 'd MMM y' }} &middot; {{ o.cliente.nombre }}
+      </p>
+    </div>
+    <div>
+      <button type="button" class="btn btn-outline-secondary mr-2" (click)="descargarPdf()">
+        <i class="fa fa-file-pdf mr-1"></i> Descargar PDF
+      </button>
+      <button type="button" class="btn btn-outline-secondary mr-2" (click)="editar()">
+        <i class="fa fa-pen mr-1"></i> Editar
+      </button>
+      <button type="button" class="btn btn-outline-danger" *ngIf="esAdmin" (click)="eliminar()">
+        <i class="fa fa-trash mr-1"></i> Eliminar
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="surface-card p-4 mb-3">
+        <h5 class="mb-3">Equipos</h5>
+        <div class="table-responsive">
+          <table class="table table-app mb-0">
+            <thead>
+              <tr>
+                <th>Equipo</th>
+                <th>Salida</th>
+                <th>Estado</th>
+                <th class="text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of o.items">
+                <td>
+                  <div class="font-weight-bold">{{ item.equipoDescripcion }}</div>
+                  <div class="text-muted-soft" style="font-size: .78rem;">
+                    {{ item.equipoCodigo || 's/código' }} &middot; {{ item.equipoMarca || 's/marca' }}
+                  </div>
+                  <div class="text-muted-soft mt-1" style="font-size: .76rem;" *ngIf="item.accesorios.length > 0">
+                    <i class="fa fa-toolbox mr-1"></i>
+                    <span *ngFor="let a of item.accesorios; let last = last">
+                      {{ a.nombre }}<span *ngIf="a.cantidad > 1"> (x{{ a.cantidad }})</span>{{ last ? '' : ', ' }}
+                    </span>
+                  </div>
+
+                  <!-- El equipo ya volvió, pero uno o más accesorios se quedaron: se pueden registrar por separado. -->
+                  <div class="mt-2" *ngIf="item.devuelto && accesoriosPendientes(item).length > 0">
+                    <div class="d-flex align-items-center justify-content-between mb-1" style="font-size: .76rem;"
+                         *ngFor="let a of accesoriosPendientes(item)">
+                      <span style="color: var(--warning-soft-text);">
+                        <i class="fa fa-exclamation-triangle mr-1"></i>{{ a.nombre }} pendiente
+                      </span>
+                      <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 ml-2"
+                              style="font-size: .72rem;" (click)="registrarEntradaAccesorio(item, a)">
+                        <i class="fa fa-check mr-1"></i>Entrada
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td style="font-size: .85rem;">{{ item.observacionSalida || '—' }}</td>
+                <td>
+                  <span class="badge" [class.badge-warning]="!item.devuelto" [class.badge-success]="item.devuelto">
+                    {{ item.devuelto ? 'Devuelto' : 'En la calle' }}
+                  </span>
+                  <div class="text-muted-soft mt-1" style="font-size: .75rem;" *ngIf="item.devuelto">
+                    {{ item.fechaDevolucion | date: 'd MMM y' }} &middot; recibió {{ item.recibidoPor?.nombre }}
+                    <div *ngIf="item.observacionDevolucion">{{ item.observacionDevolucion }}</div>
+                  </div>
+                </td>
+                <td class="text-right">
+                  <button type="button" class="btn btn-sm btn-outline-success" *ngIf="!item.devuelto"
+                          (click)="registrarEntrada(item)">
+                    <i class="fa fa-check mr-1"></i> Registrar entrada
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="surface-card p-4 mb-3" *ngIf="o.observaciones">
+        <h5 class="mb-2">Observaciones generales</h5>
+        <p class="mb-0">{{ o.observaciones }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="surface-card p-4">
+        <div class="mb-3">
+          <div class="text-muted-soft" style="font-size: .8rem;">Estado</div>
+          <span class="badge" [class.badge-warning]="o.estado === 'ABIERTA'"
+                [class.badge-info]="o.estado === 'PARCIAL'"
+                [class.badge-success]="o.estado === 'CERRADA'">
+            {{ estadoLabel[o.estado] }}
+          </span>
+        </div>
+        <div class="mb-3">
+          <div class="text-muted-soft" style="font-size: .8rem;">Destino</div>
+          <div>{{ o.cliente.nombre }}</div>
+        </div>
+        <div class="mb-3">
+          <div class="text-muted-soft" style="font-size: .8rem;">Responsable</div>
+          <div>{{ o.responsable.nombre }}</div>
+        </div>
+        <div class="mb-0">
+          <div class="text-muted-soft" style="font-size: .8rem;">Generado por</div>
+          <div>{{ o.creadoPorNombre || '—' }}</div>
+          <div class="text-muted-soft" style="font-size: .78rem;">{{ o.creadoEn | date: 'd MMM y, HH:mm' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,144 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ esEdicion ? 'Editar servicio' : 'Nuevo servicio' }}</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss()">
+    <span>&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="empty-state" *ngIf="cargando">
+    <i class="fa fa-spinner fa-spin" style="font-size: 2rem;"></i>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate *ngIf="!cargando">
+    <div class="alert alert-danger py-2" *ngIf="errorGeneral">{{ errorGeneral }}</div>
+
+    <div class="surface-card p-3 mb-3">
+      <h6 class="mb-3">Información general</h6>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label>Equipo *</label>
+          <select class="form-control" formControlName="equipoId" (change)="onEquipoChange()">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let e of equipos" [ngValue]="e.id">
+              {{ e.descripcionEquipo }} {{ e.codigo ? '(' + e.codigo + ')' : '' }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-md-3">
+          <label>Tipo de servicio *</label>
+          <select class="form-control" formControlName="tipoServicio">
+            <option *ngFor="let t of tipos" [value]="t">{{ tipoLabel[t] }}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-3">
+          <label>Fecha *</label>
+          <input type="date" class="form-control" formControlName="fecha" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción del trabajo *</label>
+        <textarea class="form-control" formControlName="descripcion" rows="3"></textarea>
+        <div class="invalid-feedback d-block" *ngIf="form.get('descripcion')?.invalid && form.get('descripcion')?.touched">
+          La descripción es obligatoria.
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label>Técnico responsable *</label>
+          <select class="form-control" formControlName="tecnicoResponsableId">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let t of tecnicos" [ngValue]="t.id">{{ t.nombre }}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-6 mb-0">
+          <label>Costo valorizado *</label>
+          <input type="number" min="0" step="0.01" class="form-control" formControlName="costoValorizado" />
+        </div>
+      </div>
+    </div>
+
+    <div class="surface-card p-3 mb-3">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="mb-0">Repuestos utilizados</h6>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="agregarRepuesto()">
+          <i class="fa fa-plus mr-1"></i> Agregar repuesto
+        </button>
+      </div>
+
+      <div class="table-responsive" *ngIf="repuestoFilas.length > 0">
+        <table class="table table-app mb-0">
+          <thead>
+            <tr>
+              <th>Repuesto</th>
+              <th style="width: 110px;">Cantidad</th>
+              <th style="width: 140px;" class="text-right">Costo unitario</th>
+              <th style="width: 120px;" class="text-right">Subtotal</th>
+              <th style="width: 50px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fila of repuestoFilas; let i = index">
+              <td>
+                <input type="text" class="form-control" placeholder="Nombre del repuesto"
+                       [(ngModel)]="fila.nombre" [ngModelOptions]="{standalone: true}" />
+              </td>
+              <td>
+                <input type="number" min="0.01" step="0.01" class="form-control" [(ngModel)]="fila.cantidad" [ngModelOptions]="{standalone: true}" />
+              </td>
+              <td>
+                <input type="number" min="0" step="0.01" class="form-control text-right" [(ngModel)]="fila.costoUnitario" [ngModelOptions]="{standalone: true}" />
+              </td>
+              <td class="text-right">{{ subtotalRepuesto(fila) | cop }}</td>
+              <td class="text-right">
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="quitarRepuesto(i)">
+                  <i class="fa fa-times"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="text-right font-weight-bold">Total repuestos</td>
+              <td class="text-right font-weight-bold">{{ totalRepuestos | cop }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="text-muted-soft mb-0" style="font-size: .88rem;" *ngIf="repuestoFilas.length === 0">
+        No se usaron repuestos en este servicio.
+      </p>
+    </div>
+
+    <div class="surface-card p-3 mb-3" *ngIf="equipoSeleccionado">
+      <h6 class="mb-1">Checklist</h6>
+      <p class="text-muted-soft mb-3" style="font-size: .85rem;">
+        Ítems de revisión configurados para la categoría del equipo seleccionado.
+      </p>
+
+      <div *ngFor="let fila of checklistFilas" class="checklist-row">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" [id]="'chk-' + fila.itemId" [(ngModel)]="fila.completado" [ngModelOptions]="{standalone: true}" />
+          <label class="form-check-label" [for]="'chk-' + fila.itemId">{{ fila.nombre }}</label>
+        </div>
+        <input type="text" class="form-control form-control-sm mt-1" placeholder="Observación (opcional)"
+               [(ngModel)]="fila.observacion" [ngModelOptions]="{standalone: true}" />
+      </div>
+
+      <p class="text-muted-soft mb-0" style="font-size: .88rem;" *ngIf="checklistFilas.length === 0">
+        No hay ítems de checklist configurados para esta categoría todavía.
+      </p>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer" *ngIf="!cargando">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-brand" [disabled]="guardando" (click)="guardar()">
+    {{ guardando ? 'Guardando...' : 'Guardar' }}
+  </button>
+</div>

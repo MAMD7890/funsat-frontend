@@ -1,0 +1,102 @@
+<div class="mb-4">
+  <h2 class="mb-0">Importar desde Excel</h2>
+  <p class="text-muted-soft mb-0">Carga inicial de datos reales — solo administradores. La importación es tolerante a fallos: las filas con error se reportan sin detener el resto.</p>
+</div>
+
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="surface-card p-4 h-100">
+      <h5 class="mb-1"><i class="fa fa-file-excel mr-2" style="color: var(--success);"></i>Inventario Master</h5>
+      <p class="text-muted-soft mb-3" style="font-size: .85rem;">Equipos propios (hoja "Master").</p>
+
+      <div class="form-group">
+        <input type="file" class="form-control-file" accept=".xlsx" (change)="onArchivoMaster($event)" />
+      </div>
+      <button type="button" class="btn btn-brand mr-2" [disabled]="!archivoMaster || subiendoMaster" (click)="importarMaster()">
+        <i class="fa fa-upload mr-1"></i> {{ subiendoMaster ? 'Importando...' : 'Importar' }}
+      </button>
+      <button type="button" class="btn btn-outline-secondary" (click)="descargarPlantillaMaster()">
+        <i class="fa fa-download mr-1"></i> Descargar plantilla de ejemplo
+      </button>
+
+      <div class="mt-4" *ngIf="resultadoMaster as r">
+        <div class="d-flex" style="gap: 1.5rem;">
+          <div>
+            <div class="text-muted-soft small">Total filas</div>
+            <div class="font-weight-bold">{{ r.totalFilas }}</div>
+          </div>
+          <div>
+            <div class="text-muted-soft small">Importadas</div>
+            <div class="font-weight-bold" style="color: var(--success);">{{ r.filasImportadas }}</div>
+          </div>
+          <div>
+            <div class="text-muted-soft small">Con error</div>
+            <div class="font-weight-bold" [style.color]="r.filasConError > 0 ? 'var(--danger)' : 'inherit'">{{ r.filasConError }}</div>
+          </div>
+        </div>
+
+        <div class="mt-3" *ngIf="r.errores.length > 0">
+          <p class="mb-1 font-weight-bold" style="font-size: .85rem;">Errores</p>
+          <ul class="mb-0" style="font-size: .82rem; max-height: 180px; overflow-y: auto;">
+            <li *ngFor="let e of r.errores"><strong>Fila {{ e.fila }}:</strong> {{ e.motivo }}</li>
+          </ul>
+        </div>
+
+        <div class="mt-3" *ngIf="r.advertencias.length > 0">
+          <p class="mb-1 font-weight-bold" style="font-size: .85rem;">Advertencias</p>
+          <ul class="mb-0" style="font-size: .82rem; max-height: 180px; overflow-y: auto;">
+            <li *ngFor="let w of r.advertencias">{{ w }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-4">
+    <div class="surface-card p-4 h-100">
+      <h5 class="mb-1"><i class="fa fa-file-excel mr-2" style="color: var(--success);"></i>Servicio Taller</h5>
+      <p class="text-muted-soft mb-3" style="font-size: .85rem;">Equipos externos de clientes en taller (hoja "Hoja1").</p>
+
+      <div class="form-group">
+        <input type="file" class="form-control-file" accept=".xlsx" (change)="onArchivoTaller($event)" />
+      </div>
+      <button type="button" class="btn btn-brand mr-2" [disabled]="!archivoTaller || subiendoTaller" (click)="importarTaller()">
+        <i class="fa fa-upload mr-1"></i> {{ subiendoTaller ? 'Importando...' : 'Importar' }}
+      </button>
+      <button type="button" class="btn btn-outline-secondary" (click)="descargarPlantillaTaller()">
+        <i class="fa fa-download mr-1"></i> Descargar plantilla de ejemplo
+      </button>
+
+      <div class="mt-4" *ngIf="resultadoTaller as r">
+        <div class="d-flex" style="gap: 1.5rem;">
+          <div>
+            <div class="text-muted-soft small">Total filas</div>
+            <div class="font-weight-bold">{{ r.totalFilas }}</div>
+          </div>
+          <div>
+            <div class="text-muted-soft small">Importadas</div>
+            <div class="font-weight-bold" style="color: var(--success);">{{ r.filasImportadas }}</div>
+          </div>
+          <div>
+            <div class="text-muted-soft small">Con error</div>
+            <div class="font-weight-bold" [style.color]="r.filasConError > 0 ? 'var(--danger)' : 'inherit'">{{ r.filasConError }}</div>
+          </div>
+        </div>
+
+        <div class="mt-3" *ngIf="r.errores.length > 0">
+          <p class="mb-1 font-weight-bold" style="font-size: .85rem;">Errores</p>
+          <ul class="mb-0" style="font-size: .82rem; max-height: 180px; overflow-y: auto;">
+            <li *ngFor="let e of r.errores"><strong>Fila {{ e.fila }}:</strong> {{ e.motivo }}</li>
+          </ul>
+        </div>
+
+        <div class="mt-3" *ngIf="r.advertencias.length > 0">
+          <p class="mb-1 font-weight-bold" style="font-size: .85rem;">Advertencias</p>
+          <ul class="mb-0" style="font-size: .82rem; max-height: 180px; overflow-y: auto;">
+            <li *ngFor="let w of r.advertencias">{{ w }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

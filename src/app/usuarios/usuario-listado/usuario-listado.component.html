@@ -1,0 +1,73 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+  <div>
+    <h2 class="mb-0">Usuarios</h2>
+    <p class="text-muted-soft mb-0">Cuentas de acceso al sistema y sus roles</p>
+  </div>
+  <button class="btn btn-brand" (click)="nuevoUsuario()">
+    <i class="fa fa-plus mr-1"></i> Nuevo usuario
+  </button>
+</div>
+
+<div class="surface-card p-3">
+  <div class="table-responsive">
+    <table class="table table-app mb-0">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Usuario</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuariosFiltrados">
+          <td class="font-weight-bold">
+            {{ usuario.nombre }}
+            <span class="badge badge-secondary ml-1" *ngIf="usuario.username === miUsername" style="font-size: .7rem;">Tú</span>
+          </td>
+          <td>{{ usuario.username }}</td>
+          <td class="text-muted-soft">{{ usuario.email || '—' }}</td>
+          <td>
+            <span class="badge badge-info"><i class="fa {{ rolIcono[usuario.rol] }} mr-1"></i>{{ rolLabel[usuario.rol] }}</span>
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="usuario.activo" [class.badge-secondary]="!usuario.activo">
+              {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="text-right">
+            <div class="table-actions">
+              <button class="table-action-btn" (click)="editarUsuario(usuario)" title="Editar">
+                <i class="fa fa-pen"></i>
+              </button>
+              <button class="table-action-btn" (click)="resetearPassword(usuario)" title="Resetear contraseña">
+                <i class="fa fa-key"></i>
+              </button>
+              <button
+                class="table-action-btn"
+                [class.table-action-danger]="usuario.activo"
+                [class.table-action-success]="!usuario.activo"
+                [disabled]="usuario.username === miUsername"
+                (click)="cambiarEstado(usuario)"
+                [title]="usuario.activo ? 'Desactivar' : 'Activar'"
+              >
+                <i class="fa" [class.fa-user-slash]="usuario.activo" [class.fa-user-check]="!usuario.activo"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="usuariosFiltrados.length === 0 && !cargando">
+      <i class="fa fa-users mb-2" style="font-size: 2rem;"></i>
+      <p class="mb-0">{{ terminoBusqueda ? 'No hay usuarios que coincidan con la búsqueda.' : 'Todavía no hay usuarios registrados.' }}</p>
+    </div>
+
+    <div class="empty-state" *ngIf="cargando">
+      <i class="fa fa-spinner fa-spin mb-2" style="font-size: 2rem;"></i>
+    </div>
+  </div>
+</div>

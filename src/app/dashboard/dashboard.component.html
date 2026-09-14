@@ -1,238 +1,251 @@
-<div class="dashboard-container">
-  <!-- Header -->
-  <div class="dashboard-header">
-    <div class="header-content">
-      <h1><i class="now-ui-icons business_chart-bar-32 section-icon"></i> Panel de Control</h1>
-      <p>Resumen general del sistema — Papelería Folder Clip</p>
+<h2 class="mb-1">Dashboard</h2>
+<p class="text-muted-soft mb-4">FUNSAT / Dashboard</p>
+
+<div class="surface-card card-highlight p-4 mb-4 d-flex align-items-center justify-content-between flex-wrap">
+  <div>
+    <p class="text-muted-soft mb-1">Buen día,</p>
+    <h3 class="mb-2">{{ usuario?.nombre || usuario?.username }}!</h3>
+    <div class="clock-widget">
+      <span class="clock-chip">
+        <i class="fa fa-calendar-alt"></i>{{ ahora | date: 'EEEE d MMM y' }}
+      </span>
+      <span class="clock-chip clock-time">
+        <i class="fa fa-clock"></i>
+        <span class="clock-digits">{{ ahora | date: 'HH' }}<span class="clock-colon">:</span>{{ ahora | date: 'mm' }}<span class="clock-colon">:</span>{{ ahora | date: 'ss' }}</span>
+      </span>
     </div>
-    <button class="btn-refresh" (click)="loadStats()">
-      <i class="now-ui-icons loader_refresh"></i> Actualizar
-    </button>
   </div>
-
-  <!-- Loading -->
-  <div *ngIf="loading" class="loading-container">
-    <div class="spinner"></div>
-    <p>Cargando estadísticas...</p>
-  </div>
-
-  <!-- Error -->
-  <div *ngIf="error && !loading" class="error-container">
-    <i class="now-ui-icons ui-1_bell-53"></i>
-    <p>No se pudieron cargar las estadísticas. Verifica que el servidor esté activo.</p>
-    <button class="btn-refresh" (click)="loadStats()">Reintentar</button>
-  </div>
-
-  <!-- Content -->
-  <div *ngIf="stats && !loading">
-
-    <!-- KPI Cards Row 1: Ventas -->
-    <div class="section-title">
-      <i class="now-ui-icons shopping_cart-simple"></i> Ventas
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi-card kpi-blue">
-        <div class="kpi-icon"><i class="now-ui-icons shopping_bag-16"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ stats.salesToday }}</span>
-          <span class="kpi-label">Ventas Hoy</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-green">
-        <div class="kpi-icon"><i class="now-ui-icons business_money-coins"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ formatCurrency(stats.revenueToday) }}</span>
-          <span class="kpi-label">Ingresos Hoy</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-purple">
-        <div class="kpi-icon"><i class="now-ui-icons ui-1_calendar-60"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ stats.salesWeek }}</span>
-          <span class="kpi-label">Ventas Semana</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-yellow">
-        <div class="kpi-icon"><i class="now-ui-icons business_chart-bar-32"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ formatCurrency(stats.revenueMonth) }}</span>
-          <span class="kpi-label">Ingresos Mes</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- KPI Cards Row 2: Créditos -->
-    <div class="section-title">
-      <i class="now-ui-icons business_money-coins"></i> Créditos
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi-card kpi-orange">
-        <div class="kpi-icon"><i class="now-ui-icons files_paper"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ stats.activeCredits }}</span>
-          <span class="kpi-label">Créditos Activos</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-red">
-        <div class="kpi-icon"><i class="now-ui-icons ui-1_bell-53"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ stats.overdueCredits }}</span>
-          <span class="kpi-label">Créditos Vencidos</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-orange-light">
-        <div class="kpi-icon"><i class="now-ui-icons business_money-coins"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ formatCurrency(stats.totalPendingDebt) }}</span>
-          <span class="kpi-label">Deuda Pendiente</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-teal">
-        <div class="kpi-icon"><i class="now-ui-icons ui-2_time-alarm"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ stats.creditsDueSoon }}</span>
-          <span class="kpi-label">Vencen Pronto</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- KPI Cards Row 3: Inventario y Clientes -->
-    <div class="section-title">
-      <i class="now-ui-icons shopping_box"></i> Inventario y Clientes
-    </div>
-    <div class="kpi-grid kpi-grid-3">
-      <div class="kpi-card kpi-indigo">
-        <div class="kpi-icon"><i class="now-ui-icons shopping_box"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ stats.totalProducts }}</span>
-          <span class="kpi-label">Total Productos</span>
-        </div>
-      </div>
-      <div class="kpi-card" [ngClass]="stats.lowStockProducts > 0 ? 'kpi-red' : 'kpi-green'">
-        <div class="kpi-icon"><i class="now-ui-icons ui-1_bell-53"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ stats.lowStockProducts }}</span>
-          <span class="kpi-label">Stock Bajo</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-blue-dark">
-        <div class="kpi-icon"><i class="now-ui-icons users_circle-08"></i></div>
-        <div class="kpi-info">
-          <span class="kpi-value">{{ stats.totalCustomers }}</span>
-          <span class="kpi-label">Clientes</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tables Section -->
-    <div class="tables-grid">
-
-      <!-- Top Deudores -->
-      <div class="table-card">
-        <div class="table-header">
-          <h3><i class="now-ui-icons users_circle-08"></i> Clientes que Deben</h3>
-        </div>
-        <div class="table-body" *ngIf="stats.topDebtors && stats.topDebtors.length > 0">
-          <table>
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th class="text-center">Créditos</th>
-                <th class="text-center">Vencidos</th>
-                <th class="text-right">Deuda</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let debtor of stats.topDebtors">
-                <td class="customer-name">{{ debtor.customerName }}</td>
-                <td class="text-center">
-                  <span class="badge badge-info">{{ debtor.activeCreditsCount }}</span>
-                </td>
-                <td class="text-center">
-                  <span class="badge" [ngClass]="debtor.overdueCreditsCount > 0 ? 'badge-danger' : 'badge-success'">
-                    {{ debtor.overdueCreditsCount }}
-                  </span>
-                </td>
-                <td class="text-right debt-amount">{{ formatCurrency(debtor.totalDebt) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-empty" *ngIf="!stats.topDebtors || stats.topDebtors.length === 0">
-          <i class="now-ui-icons ui-2_like"></i>
-          <p>No hay clientes con deudas pendientes</p>
-        </div>
-      </div>
-
-      <!-- Ventas Recientes -->
-      <div class="table-card">
-        <div class="table-header">
-          <h3><i class="now-ui-icons shopping_cart-simple"></i> Ventas de Hoy</h3>
-        </div>
-        <div class="table-body" *ngIf="stats.recentSales && stats.recentSales.length > 0">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Cliente</th>
-                <th class="text-center">Items</th>
-                <th class="text-right">Total</th>
-                <th>Hora</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let sale of stats.recentSales">
-                <td class="sale-id">{{ sale.saleId }}</td>
-                <td>{{ sale.customerName }}</td>
-                <td class="text-center">{{ sale.itemCount }}</td>
-                <td class="text-right sale-total">{{ formatCurrency(sale.totalValue) }}</td>
-                <td class="sale-date">{{ sale.date }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-empty" *ngIf="!stats.recentSales || stats.recentSales.length === 0">
-          <i class="now-ui-icons shopping_bag-16"></i>
-          <p>No hay ventas registradas hoy</p>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Low Stock Alert -->
-    <div class="table-card low-stock-card" *ngIf="stats.lowStockList && stats.lowStockList.length > 0">
-      <div class="table-header table-header-warning">
-        <h3><i class="now-ui-icons ui-1_bell-53"></i> Productos con Stock Bajo</h3>
-      </div>
-      <div class="table-body">
-        <table>
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Producto</th>
-              <th class="text-center">Stock Actual</th>
-              <th class="text-center">Stock Mínimo</th>
-              <th class="text-center">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of stats.lowStockList">
-              <td class="product-code">{{ item.productCode }}</td>
-              <td>{{ item.productName }}</td>
-              <td class="text-center stock-value" [ngClass]="item.stockActual === 0 ? 'stock-zero' : 'stock-low'">
-                {{ item.stockActual }}
-              </td>
-              <td class="text-center">{{ item.stockMin }}</td>
-              <td class="text-center">
-                <span class="badge" [ngClass]="item.stockActual === 0 ? 'badge-danger' : 'badge-warning'">
-                  {{ item.stockActual === 0 ? 'Agotado' : 'Bajo' }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
+  <button type="button" class="btn btn-outline-secondary" *ngIf="esAdmin" [disabled]="enviandoAlerta" (click)="enviarResumenAlertas()">
+    <i class="fa fa-paper-plane mr-1"></i> {{ enviandoAlerta ? 'Enviando...' : 'Enviar resumen por correo' }}
+  </button>
 </div>
+
+<div class="empty-state surface-card" *ngIf="cargando">
+  <i class="fa fa-spinner fa-spin mb-2" style="font-size: 2rem;"></i>
+</div>
+
+<div class="empty-state surface-card" *ngIf="error && !cargando">
+  <i class="fa fa-exclamation-triangle mb-2" style="font-size: 2rem; color: var(--danger);"></i>
+  <p class="mb-0">No se pudo cargar el resumen del dashboard.</p>
+</div>
+
+<ng-container *ngIf="resumen as r">
+  <!-- KPIs principales -->
+  <div class="row">
+    <div class="col-md-3 mb-4">
+      <div class="surface-card p-3 h-100 d-flex align-items-center" style="gap: .9rem;">
+        <span class="stat-icon brand"><i class="fa fa-toolbox"></i></span>
+        <div>
+          <div class="text-muted-soft small">Equipos totales</div>
+          <div class="h4 mb-0">{{ r.equipos.total }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="surface-card p-3 h-100 d-flex align-items-center" style="gap: .9rem;">
+        <span class="stat-icon info"><i class="fa fa-truck"></i></span>
+        <div>
+          <div class="text-muted-soft small">En la calle</div>
+          <div class="h4 mb-0">{{ r.equipos.enCalle }}</div>
+          <div class="text-muted-soft" style="font-size: .75rem;">{{ r.equipos.enAlmacen }} en almacén</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="surface-card p-3 h-100 d-flex align-items-center" style="gap: .9rem;">
+        <span class="stat-icon danger"><i class="fa fa-exclamation-triangle"></i></span>
+        <div>
+          <div class="text-muted-soft small">Mantenimientos vencidos</div>
+          <div class="h4 mb-0">{{ r.mantenimientos.vencidos }}</div>
+          <div class="text-muted-soft" style="font-size: .75rem;">{{ r.mantenimientos.proximos7Dias }} próximos (7 días)</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="surface-card p-3 h-100 d-flex align-items-center" style="gap: .9rem;">
+        <span class="stat-icon success"><i class="fa fa-coins"></i></span>
+        <div>
+          <div class="text-muted-soft small">Costo del mes</div>
+          <div class="h4 mb-0">{{ r.servicios.costoMesActual | cop }}</div>
+          <div class="text-muted-soft" style="font-size: .75rem;">
+            {{ r.servicios.costoTotalHistorico | cop }} histórico
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Estado del parque de equipos -->
+    <div class="col-md-4 mb-4">
+      <div class="surface-card p-4 h-100">
+        <h6 class="mb-3">Estado de los equipos</h6>
+        <div class="d-flex justify-content-between mb-2">
+          <span><i class="fa fa-circle mr-2" style="font-size: .5rem; color: var(--success);"></i>Activos</span>
+          <span class="font-weight-bold">{{ r.equipos.activos }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span><i class="fa fa-circle mr-2" style="font-size: .5rem; color: var(--warning);"></i>En mantenimiento</span>
+          <span class="font-weight-bold">{{ r.equipos.enMantenimiento }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span><i class="fa fa-circle mr-2" style="font-size: .5rem; color: var(--text-muted);"></i>Inactivos</span>
+          <span class="font-weight-bold">{{ r.equipos.inactivos }}</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span><i class="fa fa-circle mr-2" style="font-size: .5rem; color: var(--danger);"></i>Dados de baja</span>
+          <span class="font-weight-bold">{{ r.equipos.dadosDeBaja }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipos por categoria -->
+    <div class="col-md-4 mb-4">
+      <div class="surface-card p-4 h-100">
+        <h6 class="mb-3">Equipos por categoría</h6>
+        <div *ngFor="let c of r.equipos.porCategoria" class="mb-3">
+          <div class="d-flex justify-content-between mb-1" style="font-size: .85rem;">
+            <span>{{ c.categoriaNombre }}</span>
+            <span class="text-muted-soft">{{ c.cantidad }}</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="porcentaje(c.cantidad, r.equipos.total)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Servicios por estado -->
+    <div class="col-md-4 mb-4">
+      <div class="surface-card p-4 h-100">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h6 class="mb-0">Servicios por estado</h6>
+          <a routerLink="/apps/kanban" class="text-muted-soft" style="font-size: .78rem;">Ver kanban <i class="fa fa-arrow-right ml-1"></i></a>
+        </div>
+        <div *ngFor="let e of estadosServicio" class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge badge-info">{{ estadoServicioLabel[e] }}</span>
+          <span class="font-weight-bold">{{ porEstadoServicio(e) }}</span>
+        </div>
+        <div class="text-muted-soft mt-3 pt-2" style="font-size: .78rem; border-top: 1px solid var(--surface-border);">
+          {{ r.servicios.total }} servicios registrados en total
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Servicios por tipo -->
+    <div class="col-md-6 mb-4">
+      <div class="surface-card p-4 h-100">
+        <h6 class="mb-3">Servicios por tipo</h6>
+        <div *ngFor="let t of tiposServicio" class="mb-3">
+          <div class="d-flex justify-content-between mb-1" style="font-size: .85rem;">
+            <span>{{ tipoServicioLabel[t] }}</span>
+            <span class="text-muted-soft">{{ porTipoServicio(t) }}</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="porcentaje(porTipoServicio(t), r.servicios.total)"></div>
+          </div>
+        </div>
+        <div class="text-muted-soft mt-3 pt-2" style="font-size: .78rem; border-top: 1px solid var(--surface-border);" *ngIf="ratioPreventivo !== null">
+          <i class="fa fa-shield-alt mr-1" style="color: var(--success);"></i>
+          {{ ratioPreventivo }}% de los mantenimientos son preventivos (vs. correctivos)
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipos por propiedad -->
+    <div class="col-md-6 mb-4">
+      <div class="surface-card p-4 h-100">
+        <h6 class="mb-3">Equipos por propiedad</h6>
+        <div *ngFor="let p of propiedades" class="mb-3">
+          <div class="d-flex justify-content-between mb-1" style="font-size: .85rem;">
+            <span>{{ propiedadLabel[p] }}</span>
+            <span class="text-muted-soft">{{ porPropiedad(p) }}</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="porcentaje(porPropiedad(p), r.equipos.total)"></div>
+          </div>
+        </div>
+        <div class="text-muted-soft mt-3 pt-2" style="font-size: .78rem; border-top: 1px solid var(--surface-border);">
+          {{ porPropiedad('EXTERNO') }} equipo{{ porPropiedad('EXTERNO') === 1 ? '' : 's' }} de cliente{{ porPropiedad('EXTERNO') === 1 ? '' : 's' }} actualmente en taller
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Actividad reciente -->
+    <div class="col-md-7 mb-4">
+      <div class="surface-card p-4 h-100">
+        <h6 class="mb-3">Actividad reciente</h6>
+
+        <div class="empty-state" *ngIf="r.serviciosRecientes.length === 0">
+          <i class="fa fa-wrench mb-2" style="font-size: 1.6rem;"></i>
+          <p class="mb-0">Todavía no hay servicios registrados.</p>
+        </div>
+
+        <div class="table-responsive" *ngIf="r.serviciosRecientes.length > 0">
+          <table class="table table-app mb-0">
+            <thead>
+              <tr>
+                <th>Equipo</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Técnico</th>
+                <th class="text-right">Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of r.serviciosRecientes" [routerLink]="['/servicios', s.id]" style="cursor: pointer;">
+                <td class="font-weight-bold">{{ s.equipoDescripcion }}</td>
+                <td>{{ tipoServicioLabel[s.tipoServicio] }}</td>
+                <td><span class="badge badge-info">{{ estadoServicioLabel[s.estado] }}</span></td>
+                <td>{{ s.tecnicoNombre || '—' }}</td>
+                <td class="text-right">{{ s.fecha | date: 'd MMM y' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipos en la calle (ubicacion) -->
+    <div class="col-md-5 mb-4">
+      <div class="surface-card p-4 h-100">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h6 class="mb-0">Equipos en la calle</h6>
+          <a routerLink="/movimientos" class="text-muted-soft" style="font-size: .78rem;">Ver movimientos <i class="fa fa-arrow-right ml-1"></i></a>
+        </div>
+
+        <p class="mb-3" style="font-size: .8rem;" *ngIf="r.equiposEnCalleResumen.enAlerta > 0">
+          <i class="fa fa-exclamation-triangle mr-1" style="color: var(--danger);"></i>
+          <span style="color: var(--danger-soft-text);">
+            {{ r.equiposEnCalleResumen.enAlerta }} lleva{{ r.equiposEnCalleResumen.enAlerta === 1 ? '' : 'n' }}
+            {{ r.equiposEnCalleResumen.diasFueraAlerta }}+ días fuera
+          </span>
+        </p>
+
+        <div class="empty-state" *ngIf="r.equiposEnCalle.length === 0">
+          <i class="fa fa-warehouse mb-2" style="font-size: 1.6rem;"></i>
+          <p class="mb-0">Todos los equipos están en su ubicación de origen.</p>
+        </div>
+
+        <div *ngFor="let e of r.equiposEnCalle" class="d-flex align-items-center justify-content-between py-2" style="border-bottom: 1px solid var(--surface-border);">
+          <div>
+            <div class="font-weight-bold" style="font-size: .88rem;">{{ e.equipoDescripcion }}</div>
+            <div class="text-muted-soft" style="font-size: .78rem;">
+              <i class="fa fa-truck mr-1"></i>{{ e.clienteNombre }}
+            </div>
+          </div>
+          <div class="text-right" style="font-size: .75rem;">
+            <span [class.text-muted-soft]="!e.enAlerta" [style.color]="e.enAlerta ? 'var(--danger)' : null" [style.fontWeight]="e.enAlerta ? 700 : 400">
+              {{ e.diasFuera }} días
+            </span>
+            <div class="text-muted-soft">{{ e.fechaSalida | date: 'd MMM y' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

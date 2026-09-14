@@ -1,0 +1,1519 @@
+/* =============================================================
+   Sistema Inventario Equipos - tema base ("ModernAdmin"-like)
+   Variables + shell (sidebar/navbar) + primitivas (cards, tablas,
+   botones) reusadas por todos los modulos.
+   ============================================================= */
+
+:root {
+  /* Le dice al navegador que dibuje los controles nativos (checkbox, radio,
+     inputs de fecha, scrollbars) en paleta clara u oscura segun el tema; sin
+     esto, un checkbox sin marcar se ve como una caja blanca solida aunque el
+     resto de la UI este en modo oscuro. */
+  color-scheme: light;
+
+  --sidebar-bg: #ffffff;
+  --sidebar-bg-active: var(--brand-soft-bg);
+  --sidebar-text: #64748b;
+  --sidebar-text-active: var(--brand-soft-text);
+  --sidebar-section-label: #94a3b8;
+  --sidebar-border: #eef2f6;
+  --sidebar-width: 260px;
+  --navbar-height: 64px;
+
+  --body-bg: #f1f5f9;
+  --surface-bg: #ffffff;
+  --surface-border: #e7ebf1;
+  --text-primary: #172033;
+  --text-secondary: #667085;
+  --text-muted: #98a2b3;
+
+  --brand: #14b8a6;
+  --brand-hover: #0d9488;
+  --brand-dark: #0f766e;
+  --brand-soft-bg: #ccfbf1;
+  --brand-soft-text: #0f766e;
+
+  --success: #16a34a;
+  --success-soft-bg: #dcfce7;
+  --success-soft-text: #15803d;
+
+  --danger: #e11d48;
+  --danger-soft-bg: #ffe4e6;
+  --danger-soft-text: #be123c;
+
+  --warning: #d97706;
+  --warning-soft-bg: #fef3c7;
+  --warning-soft-text: #b45309;
+
+  --info: #2563eb;
+  --info-soft-bg: #dbeafe;
+  --info-soft-text: #1d4ed8;
+
+  --secondary-soft-bg: #f1f5f9;
+  --secondary-soft-text: #475569;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .05);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, .08);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --sidebar-bg: #0b1220;
+  --sidebar-bg-active: var(--brand);
+  --sidebar-text: #8290a8;
+  --sidebar-text-active: #ffffff;
+  --sidebar-section-label: #4c5972;
+  --sidebar-border: #1b2436;
+
+  --body-bg: #0a0f1a;
+  --surface-bg: #111a2c;
+  --surface-border: #1f2b42;
+  --text-primary: #eef2f8;
+  --text-secondary: #97a3ba;
+  --text-muted: #626f89;
+
+  --brand-soft-bg: rgba(20, 184, 166, .16);
+  --brand-soft-text: #2dd4bf;
+
+  --success-soft-bg: rgba(22, 163, 74, .18);
+  --success-soft-text: #4ade80;
+
+  --danger-soft-bg: rgba(225, 29, 72, .18);
+  --danger-soft-text: #fb7185;
+
+  --warning-soft-bg: rgba(217, 119, 6, .2);
+  --warning-soft-text: #fbbf24;
+
+  --info-soft-bg: rgba(37, 99, 235, .2);
+  --info-soft-text: #60a5fa;
+
+  --secondary-soft-bg: rgba(148, 163, 184, .14);
+  --secondary-soft-text: #cbd5e1;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-md: 0 12px 28px rgba(0, 0, 0, .4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ng-bootstrap 12 hardcodes su backdrop a z-index:1055 (convencion Bootstrap 5,
+   donde .modal tambien vale 1055 y gana por orden en el DOM). Este proyecto usa
+   Bootstrap 4, cuya clase .modal solo llega a z-index:1050 -> el backdrop quedaba
+   por ENCIMA del modal y se comia todos los clics (Cancelar, X, Guardar, etc.). */
+.modal-backdrop {
+  z-index: 1040 !important;
+}
+
+body {
+  background-color: var(--body-bg);
+  color: var(--text-primary);
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* ---------- Layout shell ---------- */
+
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 1030;
+  transition: transform .2s ease, background-color .2s ease, border-color .2s ease;
+}
+
+.app-sidebar .brand {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: 1.1rem 1.25rem;
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: .03em;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.app-sidebar .brand-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.app-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: .75rem .75rem 1rem;
+}
+
+.app-sidebar .nav-section-label {
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--sidebar-section-label);
+  padding: 1rem .75rem .35rem;
+  font-weight: 700;
+}
+
+.app-sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .6rem .75rem;
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-text);
+  font-size: .9rem;
+  font-weight: 500;
+  margin-bottom: .15rem;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.app-sidebar .nav-link .icon {
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.app-sidebar .nav-link:hover:not(.disabled):not(.active) {
+  background: var(--body-bg);
+  color: var(--text-primary);
+}
+
+.app-sidebar .nav-link.active {
+  background: var(--sidebar-bg-active);
+  color: var(--sidebar-text-active);
+  font-weight: 700;
+}
+
+.app-sidebar .nav-link.disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.app-sidebar .nav-link .soon-badge {
+  margin-left: auto;
+  font-size: .62rem;
+  font-weight: 700;
+  padding: .1rem .4rem;
+  border-radius: 999px;
+  background: var(--secondary-soft-bg);
+  color: var(--secondary-soft-text);
+}
+
+.app-sidebar .user-widget {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .9rem 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, .06);
+}
+
+.app-sidebar .user-widget img,
+.avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--brand);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .85rem;
+  flex-shrink: 0;
+}
+
+.app-sidebar .user-widget .name {
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.app-sidebar .user-widget .role {
+  color: var(--sidebar-section-label);
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.app-navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: var(--sidebar-width);
+  height: var(--navbar-height);
+  background: var(--surface-bg);
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.25rem;
+  z-index: 1020;
+  transition: left .2s ease;
+}
+
+.app-navbar .search-box {
+  flex: 1;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--body-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  padding: .5rem .8rem;
+  color: var(--text-muted);
+  font-size: .875rem;
+}
+
+.app-navbar .search-box input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text-primary);
+  font-size: .875rem;
+}
+
+.app-navbar .search-box input::placeholder {
+  color: var(--text-muted);
+}
+
+.app-navbar .search-box .search-clear-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.app-navbar .search-box .search-clear-btn:hover {
+  color: var(--text-primary);
+}
+
+.app-navbar .search-box kbd {
+  margin-left: auto;
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: 4px;
+  padding: .05rem .35rem;
+  font-size: .7rem;
+  color: var(--text-muted);
+}
+
+.app-navbar .spacer {
+  flex: 1;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease, transform .12s ease;
+}
+
+.icon-btn:hover {
+  background: var(--body-bg);
+  color: var(--text-primary);
+}
+
+.icon-btn:active {
+  transform: scale(.92);
+}
+
+.icon-btn .badge-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: .62rem;
+  line-height: 16px;
+  text-align: center;
+}
+
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: none;
+}
+
+.app-content {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--navbar-height);
+  padding: 1.5rem;
+  min-height: calc(100vh - var(--navbar-height));
+  transition: margin-left .2s ease;
+}
+
+@media (max-width: 992px) {
+  .app-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .app-navbar,
+  .app-content {
+    left: 0;
+    margin-left: 0;
+  }
+
+  .hamburger-btn {
+    display: inline-flex;
+  }
+
+  .app-navbar .search-box {
+    display: none;
+  }
+}
+
+/* ---------- Primitivas reusables ---------- */
+
+.surface-card {
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease, background-color .2s ease;
+}
+
+/* Card de acento (briefing/bienvenida): mismo surface-card con un tinte
+   suave de marca en vez de blanco/oscuro plano. */
+.card-highlight {
+  background: linear-gradient(135deg, var(--brand-soft-bg) 0%, var(--surface-bg) 55%);
+  border-color: var(--brand-soft-bg);
+}
+
+[data-theme='dark'] .card-highlight {
+  background: linear-gradient(135deg, rgba(20, 184, 166, .14) 0%, var(--surface-bg) 60%);
+}
+
+/* Chips pequenos tipo pastilla, usados para senales rapidas (ej. dashboard). */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .75rem;
+  border-radius: 999px;
+  background: var(--body-bg);
+  border: 1px solid var(--surface-border);
+  color: var(--text-secondary);
+  font-size: .8rem;
+  font-weight: 500;
+}
+
+.chip i {
+  color: var(--brand);
+}
+
+/* Reloj en vivo del saludo del dashboard: chips "frosted" neutros (funcionan
+   igual de bien sobre el fondo claro y el degradado oscuro de card-highlight),
+   segundos en fuente monoespaciada con tabular-nums para que los digitos no
+   salten de ancho, y los dos puntos parpadean para reforzar que va en vivo. */
+.clock-widget {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+
+.clock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .12);
+  border: 1px solid rgba(127, 127, 127, .18);
+  color: var(--text-secondary);
+  font-size: .82rem;
+  text-transform: capitalize;
+}
+
+.clock-chip i {
+  color: var(--brand);
+}
+
+.clock-time .clock-digits {
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--text-primary);
+  font-size: .92rem;
+}
+
+.clock-colon {
+  display: inline-block;
+  padding: 0 1px;
+  animation: clockBlink 1s steps(1) infinite;
+}
+
+@keyframes clockBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: .25; }
+}
+
+/* Iconos circulares/redondeados con tinte de color, usados en tarjetas de
+   estadisticas (dashboard). */
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.stat-icon.brand   { background: var(--brand-soft-bg);   color: var(--brand-soft-text); }
+.stat-icon.success { background: var(--success-soft-bg); color: var(--success-soft-text); }
+.stat-icon.warning { background: var(--warning-soft-bg); color: var(--warning-soft-text); }
+.stat-icon.danger  { background: var(--danger-soft-bg);  color: var(--danger-soft-text); }
+.stat-icon.info    { background: var(--info-soft-bg);    color: var(--info-soft-text); }
+
+/* Barras de progreso simples (distribucion por categoria/tipo). */
+.bar-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--body-bg);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand);
+  transition: width .3s ease;
+}
+
+.text-muted-soft {
+  color: var(--text-muted);
+}
+
+/* ---------- Overrides globales de Bootstrap 4 (botones, badges, forms,
+   modales, dropdowns, paginacion, alerts) para que todo el sistema
+   adopte la paleta/roundness nuevas sin tocar cada componente. ---------- */
+
+.btn {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: .875rem;
+  transition: transform .12s ease, background-color .15s ease, border-color .15s ease,
+    box-shadow .15s ease, opacity .15s ease, filter .15s ease;
+}
+
+.btn:active:not(:disabled):not(.disabled) {
+  transform: scale(.97);
+}
+
+.btn-brand {
+  background: linear-gradient(135deg, var(--brand), var(--brand-hover));
+  border-color: var(--brand-hover);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .12);
+}
+
+.btn-brand:hover {
+  background: linear-gradient(135deg, var(--brand-hover), var(--brand-dark));
+  border-color: var(--brand-dark);
+  color: #fff;
+}
+
+.btn-brand:disabled,
+.btn-brand.disabled {
+  background: var(--brand);
+  border-color: var(--brand);
+  opacity: .6;
+}
+
+/* Variantes solidas de Bootstrap (danger/success/warning/info/primary) que
+   antes se quedaban con los colores estaticos por defecto de Bootstrap 4 en
+   vez de los tokens del tema -se notaba, por ejemplo, en el boton "Eliminar"
+   de los dialogos de confirmacion, que no se adaptaba a modo oscuro-. */
+.btn-danger, .btn-success, .btn-warning, .btn-info, .btn-primary {
+  color: #fff;
+}
+
+.btn-danger  { background: var(--danger);  border-color: var(--danger); }
+.btn-success { background: var(--success); border-color: var(--success); }
+.btn-warning { background: var(--warning); border-color: var(--warning); }
+.btn-info    { background: var(--info);    border-color: var(--info); }
+.btn-primary { background: var(--brand);   border-color: var(--brand-hover); }
+
+.btn-danger:hover, .btn-success:hover, .btn-warning:hover, .btn-info:hover, .btn-primary:hover {
+  filter: brightness(.92);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: var(--secondary-soft-bg);
+  border-color: var(--surface-border);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+  background: var(--body-bg);
+  border-color: var(--surface-border);
+  color: var(--text-primary);
+}
+
+.btn-outline-secondary {
+  color: var(--text-secondary);
+  border-color: var(--surface-border);
+  background: transparent;
+}
+
+.btn-outline-secondary:hover {
+  background: var(--body-bg);
+  border-color: var(--surface-border);
+  color: var(--text-primary);
+}
+
+.btn-outline-danger {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: transparent;
+}
+
+.btn-outline-danger:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.btn-outline-success {
+  color: var(--success);
+  border-color: var(--success);
+  background: transparent;
+}
+
+.btn-outline-success:hover {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+/* Badges: pill suave (fondo tenue + texto saturado) en vez del Bootstrap
+   solido por defecto. */
+.badge {
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: .72rem;
+  padding: .32em .7em;
+  letter-spacing: .01em;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.badge-success   { background: var(--success-soft-bg);   color: var(--success-soft-text); }
+.badge-danger    { background: var(--danger-soft-bg);    color: var(--danger-soft-text); }
+.badge-warning   { background: var(--warning-soft-bg);   color: var(--warning-soft-text); }
+.badge-info      { background: var(--info-soft-bg);      color: var(--info-soft-text); }
+.badge-secondary { background: var(--secondary-soft-bg); color: var(--secondary-soft-text); }
+.badge-primary   { background: var(--brand-soft-bg);     color: var(--brand-soft-text); }
+.badge-light     { background: var(--secondary-soft-bg); color: var(--text-secondary); }
+.badge-dark      { background: var(--text-primary);      color: var(--surface-bg); }
+
+/* Forms */
+.form-control {
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+}
+
+.form-control:focus {
+  background: var(--surface-bg);
+  border-color: var(--brand);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 3px var(--brand-soft-bg);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-control:disabled,
+.form-control[readonly] {
+  background: var(--body-bg);
+  opacity: .75;
+}
+
+.form-group label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: .85rem;
+}
+
+/* Modales */
+.modal-content {
+  background: var(--surface-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+/* Bootstrap 4 ya anima el translateY de .modal-dialog vía .fade/.show; se le
+   suma una opacidad y una curva con un pequeño rebote para que la entrada
+   se sienta menos abrupta. */
+.modal.fade .modal-dialog {
+  transition: transform .25s cubic-bezier(.34, 1.4, .64, 1), opacity .2s ease;
+  opacity: 0;
+}
+
+.modal.show .modal-dialog {
+  opacity: 1;
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--surface-border);
+}
+
+.modal-header .close {
+  color: var(--text-secondary);
+  text-shadow: none;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: .2rem .55rem;
+  line-height: 1.4;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.modal-header .close:hover {
+  color: var(--text-primary);
+  background: var(--body-bg);
+}
+
+/* Bootstrap 4 no le quita el contorno de foco nativo del navegador a .close
+   -se veia como un recuadro blanco solido y desalineado en modo oscuro,
+   sobre todo porque ng-bootstrap enfoca este boton automaticamente al abrir
+   el modal-. Se reemplaza por un anillo sutil con el color de marca. */
+.modal-header .close:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-soft-bg);
+}
+
+/* Checkboxes y radios: el navegador los dibuja con sus colores nativos
+   (caja blanca solida), que no se adaptan a modo oscuro. accent-color los
+   tiñe con la marca mantenendo el control nativo (soporte amplio en
+   navegadores modernos), y el resto de props evita que la caja sin marcar
+   quede blanca pura sobre el fondo oscuro. */
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--brand);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.form-check-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-soft-bg);
+}
+
+/* Bootstrap 4 posiciona .form-check-input con position:absolute + margin-left
+   negativo, calculado para su tamaño de checkbox nativo por defecto. Al
+   fijarle un ancho/alto explicito arriba, esas cuentas dejan de cuadrar y el
+   checkbox se sale de su columna y queda flotando sobre el campo vecino. Se
+   reemplaza por un layout flex simple (checkbox + label en fila), que no
+   depende de posicionamiento absoluto ni de margenes negativos calculados a mano. */
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding-left: 0;
+}
+
+.form-check-input {
+  position: static;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.form-check-label {
+  margin-bottom: 0;
+}
+
+/* Dropdowns (ngbDropdown usa las clases de Bootstrap) */
+.dropdown-menu {
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary);
+  animation: dropdownFadeIn .15s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-item {
+  color: var(--text-primary);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: var(--body-bg);
+  color: var(--text-primary);
+}
+
+.dropdown-divider {
+  border-color: var(--surface-border);
+}
+
+/* Paginacion */
+.page-link {
+  background: var(--surface-bg);
+  border-color: var(--surface-border);
+  color: var(--text-secondary);
+}
+
+.page-link:hover {
+  background: var(--body-bg);
+  color: var(--text-primary);
+  border-color: var(--surface-border);
+}
+
+.page-item.active .page-link {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.page-item.disabled .page-link {
+  background: var(--surface-bg);
+  border-color: var(--surface-border);
+  color: var(--text-muted);
+}
+
+/* Alerts */
+.alert {
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+}
+
+.alert-danger {
+  background: var(--danger-soft-bg);
+  color: var(--danger-soft-text);
+}
+
+.alert-success {
+  background: var(--success-soft-bg);
+  color: var(--success-soft-text);
+}
+
+.alert-warning {
+  background: var(--warning-soft-bg);
+  color: var(--warning-soft-text);
+}
+
+.table-app thead th {
+  text-transform: uppercase;
+  font-size: .72rem;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--surface-border);
+  background: transparent;
+}
+
+.table-app td,
+.table-app th {
+  vertical-align: middle;
+  border-color: var(--surface-border);
+  color: var(--text-primary);
+}
+
+.table-app tbody tr {
+  transition: background-color .15s ease;
+}
+
+.table-app tbody tr:hover {
+  background: var(--body-bg);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+/* Botones de acciones (editar/eliminar/etc.) en filas de tabla: iconos
+   planos y circulares en vez de botones bootstrap con borde, mismo
+   lenguaje visual que .icon-btn del navbar. */
+.table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .3rem;
+  flex-wrap: nowrap;
+}
+
+.table-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background-color .15s ease, color .15s ease, transform .12s ease;
+}
+
+.table-action-btn:hover:not(:disabled) {
+  background: var(--body-bg);
+  color: var(--text-primary);
+}
+
+.table-action-btn:active:not(:disabled) {
+  transform: scale(.9);
+}
+
+.table-action-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.table-action-btn.table-action-danger:hover:not(:disabled) {
+  background: rgba(229, 72, 77, .12);
+  color: var(--danger);
+}
+
+.table-action-btn.table-action-success:hover:not(:disabled) {
+  background: rgba(31, 178, 107, .12);
+  color: var(--success);
+}
+
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+.evidencia-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: .75rem;
+}
+
+.evidencia-thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--surface-border);
+  background: var(--body-bg);
+}
+
+.evidencia-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.evidencia-thumb-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.evidencia-thumb-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(20, 26, 43, .65);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+.evidencia-thumb:hover .evidencia-thumb-delete {
+  opacity: 1;
+}
+
+.checklist-row {
+  padding: .6rem 0;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.checklist-row:last-child {
+  border-bottom: none;
+}
+
+.coming-soon .icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--brand);
+}
+
+/* ---------- Paginas de autenticacion (login, cambiar contraseña) ----------
+   Global a proposito: varios componentes (LoginComponent, ChangePasswordComponent)
+   comparten este mismo layout, y el CSS con styleUrls de un componente queda
+   encapsulado solo a ese componente en Angular, asi que no se puede reusar
+   desde otro. */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+}
+
+.login-form-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-bg);
+  padding: 2rem 1.5rem;
+}
+
+.login-form-wrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: .03em;
+  color: var(--text-primary);
+}
+
+.login-brand .brand-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.login-page .form-group label {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: .35rem;
+}
+
+.login-page .form-control {
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: .55rem .8rem;
+  height: auto;
+}
+
+.login-page .form-control:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(59, 95, 226, .12);
+  background: var(--surface-bg);
+  color: var(--text-primary);
+}
+
+.login-page .btn-brand {
+  padding: .6rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.login-tag {
+  display: inline-block;
+  padding: .25rem .7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-left: .6rem;
+}
+
+.password-input {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: .6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+}
+
+.footer-note {
+  font-size: .78rem;
+}
+
+.login-hero-side {
+  flex: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #2dd4bf 0%, #0f766e 45%, #042f2e 100%);
+  color: #fff;
+  padding: 3rem;
+}
+
+.login-hero-content {
+  max-width: 380px;
+}
+
+.hero-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.login-hero-content h2 {
+  font-weight: 700;
+  margin-bottom: .75rem;
+}
+
+.hero-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+}
+
+.hero-checklist li {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: .8rem;
+  font-size: .92rem;
+  opacity: .95;
+}
+
+@media (min-width: 992px) {
+  .login-hero-side {
+    display: flex;
+  }
+}
+
+/* ---------- Apps de demostración (Kanban / Chat / Calendario / File Manager) ---------- */
+
+.kanban-board {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: .5rem;
+}
+
+.kanban-column {
+  flex: 0 0 280px;
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 220px);
+}
+
+.kanban-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .9rem 1rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.kanban-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: .6rem;
+  min-height: 60px;
+}
+
+.kanban-card {
+  background: var(--body-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: .7rem .8rem;
+  margin-bottom: .6rem;
+  cursor: grab;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.kanban-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.kanban-card-title {
+  font-weight: 600;
+  font-size: .88rem;
+  margin: .4rem 0 .2rem;
+}
+
+.kanban-card-equipo {
+  color: var(--text-secondary);
+  font-size: .78rem;
+  margin-bottom: .5rem;
+}
+
+.kanban-card-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0;
+  line-height: 1;
+}
+
+.kanban-card-delete:hover {
+  color: var(--danger);
+}
+
+.kanban-add {
+  padding: .6rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+.cdk-drag-preview {
+  box-shadow: var(--shadow-md);
+  border-radius: 8px;
+}
+
+.cdk-drag-placeholder {
+  opacity: .3;
+}
+
+.cdk-drop-list-dragging .kanban-card:not(.cdk-drag-placeholder) {
+  transition: transform .15s ease;
+}
+
+/* Chat */
+
+.chat-shell {
+  display: flex;
+  height: calc(100vh - 220px);
+  min-height: 420px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.chat-sidebar {
+  flex: 0 0 260px;
+  border-right: 1px solid var(--surface-border);
+  overflow-y: auto;
+}
+
+.chat-contact {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .8rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--surface-border);
+  transition: background-color .15s ease;
+}
+
+.chat-contact:hover {
+  background: var(--body-bg);
+}
+
+.chat-contact.active {
+  background: var(--body-bg);
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+
+.chat-contact-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chat-contact-name {
+  font-weight: 600;
+  font-size: .88rem;
+}
+
+.chat-contact-preview {
+  color: var(--text-secondary);
+  font-size: .78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-panel-header {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .9rem 1.2rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.chat-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.chat-bubble {
+  align-self: flex-start;
+  background: var(--body-bg);
+  border-radius: 12px 12px 12px 2px;
+  padding: .55rem .8rem;
+  max-width: 70%;
+  font-size: .88rem;
+}
+
+.chat-bubble.mine {
+  align-self: flex-end;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 12px 12px 2px 12px;
+}
+
+.chat-bubble-hora {
+  font-size: .68rem;
+  opacity: .7;
+  margin-top: .2rem;
+  text-align: right;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: .6rem;
+  padding: .9rem 1.2rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+/* Calendario */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-name {
+  text-align: center;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding-bottom: .4rem;
+}
+
+.calendar-cell {
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: .4rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.calendar-cell.empty {
+  border: none;
+  cursor: default;
+}
+
+.calendar-cell:not(.empty):hover {
+  background: var(--body-bg);
+}
+
+.calendar-cell.selected {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+.calendar-cell-number {
+  font-size: .82rem;
+  font-weight: 600;
+}
+
+.calendar-cell-dots {
+  margin-top: auto;
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.calendar-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--brand);
+}
+
+.calendar-dot.vencido { background: var(--danger); }
+.calendar-dot.pendiente { background: var(--warning); }
+.calendar-dot.completado { background: var(--success); }
+
+/* File Manager */
+
+.breadcrumb-files a {
+  color: var(--text-secondary);
+  font-size: .88rem;
+}
+
+.breadcrumb-files a.active {
+  color: var(--text-primary);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.file-item {
+  text-align: center;
+  padding: 1rem .5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color .15s ease, transform .15s ease;
+}
+
+.file-item:hover {
+  background: var(--body-bg);
+  transform: translateY(-2px);
+}
+
+.file-item i {
+  font-size: 2.2rem;
+  color: var(--text-muted);
+}
+
+.file-item i.text-carpeta {
+  color: var(--warning);
+}
+
+.file-item-nombre {
+  font-size: .78rem;
+  margin-top: .5rem;
+  word-break: break-word;
+}
+
+.file-item-tamano {
+  font-size: .7rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Anuncios (ngx-toastr) ----------
+   El paquete trae sus propios colores por defecto (verde/rojo/celeste que
+   no coinciden con --success/--danger/--info del tema), asi que se
+   reescriben con los tokens de marca y se les da el mismo radio/sombra que
+   el resto del sistema (surface-card, modales, etc). El selector con el id
+   del contenedor sube la especificidad por encima de la de ngx-toastr. */
+#toast-container > div {
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  opacity: 1;
+}
+
+#toast-container > .toast-success { background-color: var(--success); }
+#toast-container > .toast-error   { background-color: var(--danger); }
+#toast-container > .toast-info    { background-color: var(--info); }
+#toast-container > .toast-warning { background-color: var(--warning); }
+
+#toast-container > div:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.toast-title {
+  font-weight: 700;
+}
+
+.toast-close-button {
+  text-shadow: none;
+  opacity: .8;
+}
+
+.toast-close-button:hover {
+  opacity: 1;
+}

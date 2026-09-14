@@ -1,0 +1,123 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ esEdicion ? 'Editar orden de salida' : 'Nueva orden de salida' }}</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss()">
+    <span>&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="empty-state" *ngIf="cargando">
+    <i class="fa fa-spinner fa-spin" style="font-size: 2rem;"></i>
+  </div>
+
+  <form [formGroup]="form" novalidate *ngIf="!cargando">
+    <div class="alert alert-danger py-2" *ngIf="errorGeneral">{{ errorGeneral }}</div>
+
+    <div class="surface-card p-3 mb-3">
+      <h6 class="mb-3">Información general</h6>
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Fecha de salida *</label>
+          <input type="date" class="form-control" formControlName="fechaSalida" />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Destino (cliente) *</label>
+          <select class="form-control" formControlName="clienteId">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nombre }}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label>Responsable *</label>
+          <select class="form-control" formControlName="responsableId">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let r of responsables" [ngValue]="r.id">{{ r.nombre }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group mb-0">
+        <label>Observaciones generales</label>
+        <textarea class="form-control" formControlName="observaciones" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="surface-card p-3 mb-3">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="mb-0">Equipos que salen</h6>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="agregarFila()">
+          <i class="fa fa-plus mr-1"></i> Agregar equipo
+        </button>
+      </div>
+
+      <div class="table-responsive" *ngIf="filas.length > 0">
+        <table class="table table-app mb-0">
+          <thead>
+            <tr>
+              <th>Equipo</th>
+              <th>Observación</th>
+              <th style="width: 50px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let fila of filas; let i = index">
+              <tr>
+                <td style="min-width: 220px;">
+                  <select class="form-control" [(ngModel)]="fila.equipoId" [ngModelOptions]="{standalone: true}"
+                          (change)="onEquipoFilaChange(fila)">
+                    <option [ngValue]="null">Seleccione...</option>
+                    <ng-container *ngFor="let e of equipos">
+                      <option *ngIf="equipoDisponible(e, fila.equipoId)" [ngValue]="e.id">
+                        {{ e.descripcionEquipo }} {{ e.codigo ? '(' + e.codigo + ')' : '' }}
+                      </option>
+                    </ng-container>
+                  </select>
+                </td>
+                <td>
+                  <input type="text" class="form-control" placeholder="Ej: En buen estado"
+                         [(ngModel)]="fila.observacionSalida" [ngModelOptions]="{standalone: true}" />
+                </td>
+                <td class="text-right">
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="quitarFila(i)">
+                    <i class="fa fa-times"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="accesoriosDelEquipo(fila.equipoId).length > 0">
+                <td colspan="3" class="pt-0" style="border-top: none; background: var(--body-bg);">
+                  <div class="text-muted-soft mb-1" style="font-size: .78rem;">
+                    <i class="fa fa-toolbox mr-1"></i> Accesorios que salen con este equipo:
+                  </div>
+                  <div class="d-flex flex-wrap" style="gap: .5rem 1.2rem;">
+                    <div class="form-check" *ngFor="let a of accesoriosDelEquipo(fila.equipoId)">
+                      <input type="checkbox" class="form-check-input" [id]="'acc-' + i + '-' + a.id"
+                             [checked]="fila.accesorioIdsSeleccionados.includes(a.id)"
+                             (change)="toggleAccesorio(fila, a.id)" />
+                      <label class="form-check-label" [for]="'acc-' + i + '-' + a.id" style="font-size: .85rem;">
+                        {{ a.nombre }}<span *ngIf="a.cantidad > 1"> (x{{ a.cantidad }})</span>
+                      </label>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-muted-soft mb-0" style="font-size: .85rem;" *ngIf="filas.length === 0">
+        Agrega al menos un equipo.
+      </p>
+      <p class="text-muted-soft mt-2 mb-0" style="font-size: .78rem;">
+        Los equipos que ya están en otra orden de salida sin devolución registrada no aparecen en la lista.
+      </p>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer" *ngIf="!cargando">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-brand" [disabled]="guardando" (click)="guardar()">
+    {{ guardando ? 'Guardando...' : 'Guardar' }}
+  </button>
+</div>

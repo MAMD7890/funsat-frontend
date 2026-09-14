@@ -1,6 +1,6 @@
 {
-  "name": "folder-app",
-  "version": "1.4.0",
+  "name": "sistema-inventario-equipos-frontend",
+  "version": "1.0.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",

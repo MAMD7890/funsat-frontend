@@ -1,0 +1,86 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+  <div>
+    <h2 class="mb-0">Servicios / Mantenimientos</h2>
+    <p class="text-muted-soft mb-0" *ngIf="!filtros.equipoId">Historial de servicios registrados</p>
+    <p class="text-muted-soft mb-0" *ngIf="filtros.equipoId">
+      Historial de <strong>{{ equipoDescripcion || ('equipo #' + filtros.equipoId) }}</strong>
+      &nbsp;<a (click)="limpiarFiltros()" style="cursor:pointer;">(ver todos)</a>
+    </p>
+  </div>
+  <button type="button" class="btn btn-brand" (click)="nuevoServicio()">
+    <i class="fa fa-plus mr-1"></i> Nuevo servicio
+  </button>
+</div>
+
+<div class="surface-card p-3 mb-3">
+  <div class="form-row align-items-end">
+    <div class="form-group col-md-3 mb-2">
+      <label class="small text-muted-soft mb-1">Tipo</label>
+      <select class="form-control" [(ngModel)]="filtros.tipoServicio">
+        <option [ngValue]="null">Todos</option>
+        <option *ngFor="let t of tipos" [ngValue]="t">{{ tipoLabel[t] }}</option>
+      </select>
+    </div>
+    <div class="form-group col-md-3 mb-2">
+      <label class="small text-muted-soft mb-1">Desde</label>
+      <input type="date" class="form-control" [(ngModel)]="filtros.desde" />
+    </div>
+    <div class="form-group col-md-3 mb-2">
+      <label class="small text-muted-soft mb-1">Hasta</label>
+      <input type="date" class="form-control" [(ngModel)]="filtros.hasta" />
+    </div>
+    <div class="form-group col-md-3 mb-2 d-flex">
+      <button class="btn btn-brand mr-2" (click)="aplicarFiltros()">Filtrar</button>
+      <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="surface-card p-3">
+  <div class="table-responsive">
+    <table class="table table-app mb-0">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Equipo</th>
+          <th>Tipo</th>
+          <th>Técnico</th>
+          <th class="text-right">Costo</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of page?.content" (click)="irADetalle(s)" style="cursor: pointer;">
+          <td>{{ s.fecha | date: 'd MMM y' }}</td>
+          <td class="font-weight-bold">{{ s.equipo.descripcionEquipo }}</td>
+          <td>
+            <span class="badge badge-info">{{ tipoLabel[s.tipoServicio] }}</span>
+          </td>
+          <td>{{ s.tecnicoResponsable?.nombre || '—' }}</td>
+          <td class="text-right">{{ s.costoValorizado | cop }}</td>
+          <td class="text-right" (click)="$event.stopPropagation()">
+            <div class="table-actions">
+              <button class="table-action-btn" (click)="irAEditar(s, $event)" title="Editar">
+                <i class="fa fa-pen"></i>
+              </button>
+              <button class="table-action-btn table-action-danger" *ngIf="esAdmin" (click)="eliminar(s, $event)" title="Eliminar">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="page && page.empty && !cargando">
+      <i class="fa fa-wrench mb-2" style="font-size: 2rem;"></i>
+      <p class="mb-0">No hay servicios registrados con estos filtros.</p>
+    </div>
+
+    <div class="empty-state" *ngIf="cargando">
+      <i class="fa fa-spinner fa-spin mb-2" style="font-size: 2rem;"></i>
+    </div>
+  </div>
+
+  <app-pagination [page]="page" (cambiarPagina)="cargar($event)"></app-pagination>
+</div>

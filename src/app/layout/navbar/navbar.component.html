@@ -1,0 +1,74 @@
+<header class="app-navbar">
+  <button class="hamburger-btn" (click)="toggleSidebar.emit()" aria-label="Abrir menú">
+    <i class="fa fa-bars"></i>
+  </button>
+
+  <div class="search-box" *ngIf="mostrarBusqueda">
+    <i class="fa fa-search"></i>
+    <input
+      type="text"
+      [placeholder]="placeholderBusqueda"
+      [ngModel]="terminoBusqueda"
+      (ngModelChange)="onBuscarInput($event)"
+    />
+    <button type="button" class="search-clear-btn" *ngIf="terminoBusqueda" (click)="limpiarBusqueda()" aria-label="Limpiar búsqueda">
+      <i class="fa fa-times"></i>
+    </button>
+    <kbd *ngIf="!terminoBusqueda">Ctrl+K</kbd>
+  </div>
+
+  <div class="spacer"></div>
+
+  <button class="icon-btn" (click)="alternarTema()" title="Cambiar tema">
+    <i class="fa" [class.fa-moon]="!esOscuro" [class.fa-sun]="esOscuro"></i>
+  </button>
+
+  <div ngbDropdown class="d-inline-block" (openChange)="$event && cargarNotificaciones()">
+    <button class="icon-btn" ngbDropdownToggle title="Notificaciones">
+      <i class="fa fa-bell"></i>
+      <span class="badge-dot" *ngIf="totalNotificaciones > 0">{{ totalNotificaciones }}</span>
+    </button>
+    <div ngbDropdownMenu class="dropdown-menu-right p-0" style="min-width: 320px; max-height: 360px; overflow-y: auto;">
+      <div class="px-3 py-2 font-weight-bold border-bottom">Mantenimientos</div>
+
+      <p class="text-muted-soft mb-0 text-center py-3" *ngIf="!cargandoNotificaciones && totalNotificaciones === 0">
+        No hay recordatorios vencidos ni próximos.
+      </p>
+
+      <ng-container *ngIf="vencidos.length > 0">
+        <div class="px-3 pt-2 pb-1 text-danger" style="font-size: .72rem; font-weight: 700; text-transform: uppercase;">Vencidos</div>
+        <a ngbDropdownItem *ngFor="let r of vencidos" (click)="irAlCalendario()">
+          <i class="fa fa-exclamation-circle mr-2 text-danger"></i>
+          <span class="font-weight-bold">{{ r.equipoDescripcion }}</span> — {{ r.titulo }}
+          <div class="text-muted-soft" style="font-size: .75rem;">{{ r.fechaProgramada }}</div>
+        </a>
+      </ng-container>
+
+      <ng-container *ngIf="proximos.length > 0">
+        <div class="px-3 pt-2 pb-1 text-muted-soft" style="font-size: .72rem; font-weight: 700; text-transform: uppercase;">Próximos (7 días)</div>
+        <a ngbDropdownItem *ngFor="let r of proximos" (click)="irAlCalendario()">
+          <i class="fa fa-clock mr-2" style="color: var(--warning);"></i>
+          <span class="font-weight-bold">{{ r.equipoDescripcion }}</span> — {{ r.titulo }}
+          <div class="text-muted-soft" style="font-size: .75rem;">{{ r.fechaProgramada }}</div>
+        </a>
+      </ng-container>
+    </div>
+  </div>
+
+  <div ngbDropdown class="d-inline-block">
+    <button class="icon-btn" ngbDropdownToggle style="width: auto; padding: 0 .35rem;" title="Cuenta">
+      <span class="avatar-circle">{{ iniciales() }}</span>
+    </button>
+    <div ngbDropdownMenu class="dropdown-menu-right" style="min-width: 200px;">
+      <div class="px-3 py-2">
+        <div class="font-weight-bold">{{ usuario?.nombre || usuario?.username }}</div>
+        <div class="text-muted-soft" style="font-size: .78rem;">{{ usuario?.rol }}</div>
+      </div>
+      <div class="dropdown-divider"></div>
+      <a ngbDropdownItem routerLink="/perfil"><i class="fa fa-user mr-2"></i>Mi perfil</a>
+      <a ngbDropdownItem routerLink="/cambiar-password"><i class="fa fa-key mr-2"></i>Cambiar contraseña</a>
+      <div class="dropdown-divider"></div>
+      <a ngbDropdownItem (click)="cerrarSesion()"><i class="fa fa-sign-out-alt mr-2"></i>Cerrar sesión</a>
+    </div>
+  </div>
+</header>

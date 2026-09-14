@@ -1,0 +1,64 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ esAccesorio ? 'Registrar entrada de accesorio' : 'Registrar entrada' }}</h5>
+  <button type="button" class="close" (click)="activeModal.dismiss()">
+    <span>&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="alert alert-danger py-2" *ngIf="errorGeneral">{{ errorGeneral }}</div>
+
+  <p class="text-muted-soft" style="font-size: .85rem;" *ngIf="!esAccesorio">
+    Devolución de <strong>{{ item.equipoDescripcion }}</strong> ({{ item.equipoCodigo || 's/código' }}).
+  </p>
+
+  <p class="text-muted-soft" style="font-size: .85rem;" *ngIf="esAccesorio">
+    Devolución de <strong>{{ accesorioPendiente?.nombre }}</strong>, pendiente de {{ item.equipoDescripcion }}.
+  </p>
+
+  <form [formGroup]="form" novalidate>
+    <div class="form-group">
+      <label>Fecha de devolución *</label>
+      <input type="date" class="form-control" formControlName="fechaDevolucion"
+             [class.is-invalid]="form.get('fechaDevolucion')?.invalid && form.get('fechaDevolucion')?.touched" />
+    </div>
+
+    <div class="form-group">
+      <label>Recibido por *</label>
+      <select class="form-control" formControlName="recibidoPorId"
+              [class.is-invalid]="form.get('recibidoPorId')?.invalid && form.get('recibidoPorId')?.touched">
+        <option [ngValue]="null">Seleccione...</option>
+        <option *ngFor="let r of responsables" [ngValue]="r.id">{{ r.nombre }}</option>
+      </select>
+      <div class="invalid-feedback d-block" *ngIf="form.get('recibidoPorId')?.invalid && form.get('recibidoPorId')?.touched">
+        Selecciona quién recibe el equipo.
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="!esAccesorio && accesoriosPendientesDelEquipo.length > 0">
+      <label>¿Qué accesorios vuelven junto con el equipo?</label>
+      <div class="form-check mb-1" *ngFor="let a of accesoriosPendientesDelEquipo">
+        <input type="checkbox" class="form-check-input" [id]="'acc-' + a.accesorioId"
+               [checked]="accesoriosSeleccionados.has(a.accesorioId)" (change)="alternarAccesorio(a.accesorioId)" />
+        <label class="form-check-label" [for]="'acc-' + a.accesorioId">
+          {{ a.nombre }}<span *ngIf="a.cantidad > 1"> (x{{ a.cantidad }})</span>
+        </label>
+      </div>
+      <p class="text-muted-soft mb-0" style="font-size: .78rem;">
+        Los accesorios que no marques quedan pendientes; podrás registrar su entrada por separado más adelante.
+      </p>
+    </div>
+
+    <div class="form-group mb-0">
+      <label>Observación (opcional)</label>
+      <textarea class="form-control" formControlName="observacionDevolucion" rows="2" placeholder="Ej: Devuelto sin novedad"></textarea>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-brand" [disabled]="guardando" (click)="guardar()">
+    {{ guardando ? 'Guardando...' : 'Registrar entrada' }}
+  </button>
+</div>

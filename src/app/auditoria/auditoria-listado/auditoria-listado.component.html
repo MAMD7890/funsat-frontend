@@ -1,0 +1,77 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+  <div>
+    <h2 class="mb-0">Auditoría</h2>
+    <p class="text-muted-soft mb-0">Registro de quién creó, editó o eliminó qué y cuándo</p>
+  </div>
+</div>
+
+<div class="surface-card p-3 mb-3">
+  <div class="form-row align-items-end">
+    <div class="form-group col-md-2 mb-2">
+      <label class="small text-muted-soft mb-1">Usuario</label>
+      <select class="form-control" [(ngModel)]="filtros.usuario">
+        <option [ngValue]="null">Todos</option>
+        <option *ngFor="let usuario of usuarios" [ngValue]="usuario.username">{{ usuario.nombre }}</option>
+      </select>
+    </div>
+    <div class="form-group col-md-2 mb-2">
+      <label class="small text-muted-soft mb-1">Entidad</label>
+      <select class="form-control" [(ngModel)]="filtros.entidad">
+        <option [ngValue]="null">Todas</option>
+        <option *ngFor="let entidad of entidades" [ngValue]="entidad">{{ entidadLabel[entidad] }}</option>
+      </select>
+    </div>
+    <div class="form-group col-md-2 mb-2">
+      <label class="small text-muted-soft mb-1">Desde</label>
+      <input type="date" class="form-control" [(ngModel)]="filtros.desde" />
+    </div>
+    <div class="form-group col-md-2 mb-2">
+      <label class="small text-muted-soft mb-1">Hasta</label>
+      <input type="date" class="form-control" [(ngModel)]="filtros.hasta" />
+    </div>
+    <div class="form-group col-md-4 mb-2">
+      <button type="button" class="btn btn-brand mr-2" (click)="aplicarFiltros()">Filtrar</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+</div>
+
+<div class="surface-card p-3">
+  <div class="table-responsive">
+    <table class="table table-app mb-0">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Usuario</th>
+          <th>Acción</th>
+          <th>Entidad</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let evento of page?.content">
+          <td class="text-muted-soft" style="white-space: nowrap;">{{ evento.fecha | date: 'd MMM y, HH:mm' }}</td>
+          <td>{{ evento.usuarioNombre || evento.usuarioUsername || '—' }}</td>
+          <td>
+            <span class="badge {{ accionBadge[evento.accion] }}">
+              <i class="fa {{ accionIcono[evento.accion] }} mr-1"></i>{{ accionLabel[evento.accion] }}
+            </span>
+          </td>
+          <td>{{ entidadLabel[evento.entidad] || evento.entidad }}</td>
+          <td class="text-muted-soft">{{ evento.descripcion || '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="page && page.empty && !cargando">
+      <i class="fa fa-clipboard-list mb-2" style="font-size: 2rem;"></i>
+      <p class="mb-0">No hay eventos de auditoría que coincidan con los filtros.</p>
+    </div>
+
+    <div class="empty-state" *ngIf="cargando">
+      <i class="fa fa-spinner fa-spin mb-2" style="font-size: 2rem;"></i>
+    </div>
+  </div>
+
+  <app-pagination [page]="page" (cambiarPagina)="cargar($event)"></app-pagination>
+</div>

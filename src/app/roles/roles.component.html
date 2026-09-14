@@ -1,0 +1,96 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+  <div>
+    <h2 class="mb-0">Roles y Permisos</h2>
+    <p class="text-muted-soft mb-0">Home / Roles</p>
+  </div>
+</div>
+
+<div class="alert alert-info py-2 mb-3" style="font-size: .85rem;">
+  <i class="fa fa-shield-alt mr-1"></i>
+  Por seguridad, la gestión de Importación Excel y de esta misma pantalla siempre quedan reservadas a ADMIN,
+  sin importar lo que se configure aquí — así un ADMIN nunca puede quedar bloqueado fuera de esta página.
+</div>
+
+<div class="empty-state surface-card" *ngIf="cargando">
+  <i class="fa fa-spinner fa-spin" style="font-size: 2rem;"></i>
+</div>
+
+<div class="row" *ngIf="!cargando">
+  <div class="col-md-3 mb-4">
+    <div class="surface-card p-2">
+      <a
+        *ngFor="let r of roles"
+        class="nav-link"
+        style="color: var(--text-primary);"
+        [class.active]="r.rol === rolSeleccionado"
+        (click)="seleccionarRol(r.rol)"
+      >
+        <span class="avatar-circle mr-2" style="width: 32px; height: 32px; font-size: .8rem;">
+          <i class="fa {{ rolIcono[r.rol] }}"></i>
+        </span>
+        <span>
+          <div style="font-weight: 600;">{{ rolLabel[r.rol] }}</div>
+          <div class="text-muted-soft" style="font-size: .75rem;">{{ r.usuariosActivos }} usuario(s) activo(s)</div>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-9 mb-4" *ngIf="rolActual as datos">
+    <div class="surface-card p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap">
+        <div>
+          <h5 class="mb-0">{{ rolLabel[datos.rol] }}</h5>
+          <p class="text-muted-soft mb-0" style="font-size: .85rem;">{{ datos.usuariosActivos }} usuario(s) con este rol</p>
+        </div>
+        <button type="button" class="btn btn-brand" [disabled]="!modificado || guardando" (click)="guardar()">
+          {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-app mb-0">
+          <thead>
+            <tr>
+              <th>Módulo</th>
+              <th class="text-center">Ver</th>
+              <th class="text-center">Crear</th>
+              <th class="text-center">Editar</th>
+              <th class="text-center">Eliminar</th>
+              <th class="text-center">Todos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fila of filas">
+              <td class="font-weight-bold">{{ moduloLabel[fila.modulo] }}</td>
+              <td class="text-center">
+                <input type="checkbox" [(ngModel)]="fila.ver" (ngModelChange)="marcarModificado()" />
+              </td>
+              <td class="text-center">
+                <input type="checkbox" [(ngModel)]="fila.crear"
+                       [disabled]="sinEfecto(fila.modulo, 'CREAR')"
+                       [title]="sinEfecto(fila.modulo, 'CREAR') ? 'Sin endpoint que use este permiso todavía' : ''"
+                       (ngModelChange)="marcarModificado()" />
+              </td>
+              <td class="text-center">
+                <input type="checkbox" [(ngModel)]="fila.editar"
+                       [disabled]="sinEfecto(fila.modulo, 'EDITAR')"
+                       [title]="sinEfecto(fila.modulo, 'EDITAR') ? 'Sin endpoint que use este permiso todavía' : ''"
+                       (ngModelChange)="marcarModificado()" />
+              </td>
+              <td class="text-center">
+                <input type="checkbox" [(ngModel)]="fila.eliminar"
+                       [disabled]="sinEfecto(fila.modulo, 'ELIMINAR')"
+                       [title]="sinEfecto(fila.modulo, 'ELIMINAR') ? 'Sin endpoint que use este permiso todavía' : ''"
+                       (ngModelChange)="marcarModificado()" />
+              </td>
+              <td class="text-center">
+                <input type="checkbox" [checked]="esFilaCompleta(fila)" (change)="marcarTodo(fila, !esFilaCompleta(fila))" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

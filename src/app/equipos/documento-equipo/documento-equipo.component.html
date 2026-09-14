@@ -1,0 +1,60 @@
+<h5 class="mb-3">Documentos adjuntos</h5>
+
+<div class="upload-row mb-4">
+  <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx" (change)="onArchivoSeleccionado($event)" #fileInput />
+  <select class="form-control" [(ngModel)]="tipoDocumento" style="max-width: 140px;">
+    <option value="MANUAL">Manual</option>
+    <option value="FACTURA">Factura</option>
+    <option value="GARANTIA">Garantía</option>
+    <option value="OTRO">Otro</option>
+  </select>
+  <input type="text" class="form-control" placeholder="Descripción (opcional)" [(ngModel)]="descripcion" style="max-width: 220px;" />
+  <button type="button" class="btn btn-brand" [disabled]="subiendo || !archivoSeleccionado" (click)="subir()">
+    <i class="fa fa-upload mr-1"></i> {{ subiendo ? 'Subiendo...' : 'Subir' }}
+  </button>
+</div>
+
+<div class="empty-state" *ngIf="cargando">
+  <i class="fa fa-spinner fa-spin" style="font-size: 1.5rem;"></i>
+</div>
+
+<div class="empty-state" *ngIf="!cargando && documentos.length === 0">
+  <i class="fa fa-folder-open mb-2" style="font-size: 1.6rem;"></i>
+  <p class="mb-0">Todavía no hay documentos adjuntos para este equipo.</p>
+</div>
+
+<div *ngIf="!cargando && documentos.length > 0" class="table-responsive">
+  <table class="table table-app mb-0">
+    <thead>
+      <tr>
+        <th>Documento</th>
+        <th>Tipo</th>
+        <th>Descripción</th>
+        <th>Tamaño</th>
+        <th>Fecha</th>
+        <th class="text-right">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let d of documentos">
+        <td class="font-weight-bold">
+          <i class="fa {{ icono(d) }} mr-2 text-muted-soft"></i>{{ d.nombreOriginal || 'Documento' }}
+        </td>
+        <td><span class="badge badge-info">{{ tipoLabel[d.tipoDocumento] }}</span></td>
+        <td class="text-muted-soft">{{ d.descripcion || '—' }}</td>
+        <td class="text-muted-soft">{{ tamanoLegible(d.tamanoBytes) }}</td>
+        <td class="text-muted-soft">{{ d.fecha | date: 'd MMM y' }}</td>
+        <td class="text-right">
+          <div class="table-actions">
+            <button type="button" class="table-action-btn" (click)="descargar(d)" title="Descargar">
+              <i class="fa fa-download"></i>
+            </button>
+            <button type="button" class="table-action-btn table-action-danger" (click)="eliminar(d)" title="Eliminar">
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

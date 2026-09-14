@@ -1,0 +1,21 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap pagination-bar" *ngIf="page as p" >
+  <ng-container *ngIf="p.totalElements > 0">
+    <span class="text-muted-soft" style="font-size: .85rem;">
+      Mostrando {{ desde }}–{{ hasta }} de {{ p.totalElements }}
+    </span>
+
+    <nav *ngIf="p.totalPages > 1">
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="p.first">
+          <a class="page-link" (click)="ir(p.number - 1)">Anterior</a>
+        </li>
+        <li class="page-item" *ngFor="let idx of paginas" [class.active]="idx === p.number">
+          <a class="page-link" (click)="ir(idx)">{{ idx + 1 }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="p.last">
+          <a class="page-link" (click)="ir(p.number + 1)">Siguiente</a>
+        </li>
+      </ul>
+    </nav>
+  </ng-container>
+</div>

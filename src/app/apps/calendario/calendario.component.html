@@ -1,0 +1,55 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-4">
+  <div>
+    <h2 class="mb-0">Calendario de mantenimientos</h2>
+    <p class="text-muted-soft mb-0">Recordatorios programados por equipo</p>
+  </div>
+  <button type="button" class="btn btn-brand" (click)="nuevoRecordatorio()">
+    <i class="fa fa-plus mr-1"></i> Nuevo recordatorio
+  </button>
+</div>
+
+<div class="surface-card p-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="mesAnterior()">
+      <i class="fa fa-chevron-left"></i>
+    </button>
+    <h5 class="mb-0">{{ nombreMes }}</h5>
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="mesSiguiente()">
+      <i class="fa fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <div class="empty-state" *ngIf="cargando">
+    <i class="fa fa-spinner fa-spin" style="font-size: 1.5rem;"></i>
+  </div>
+
+  <div class="calendar-grid" *ngIf="!cargando">
+    <div class="calendar-day-name" *ngFor="let nombre of nombresDias">{{ nombre }}</div>
+
+    <div
+      class="calendar-cell"
+      *ngFor="let dia of diasDelMes"
+      [class.empty]="dia === null"
+      (click)="seleccionarDia(dia)"
+    >
+      <ng-container *ngIf="dia !== null">
+        <div class="calendar-cell-number">{{ dia }}</div>
+        <div class="calendar-cell-dots" *ngIf="recordatoriosDelDia(dia).length > 0">
+          <span
+            class="calendar-dot"
+            *ngFor="let r of recordatoriosDelDia(dia)"
+            [class.vencido]="claseEstado(r) === 'vencido'"
+            [class.pendiente]="claseEstado(r) === 'pendiente'"
+            [class.completado]="claseEstado(r) === 'completado'"
+          ></span>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="d-flex mt-3" style="gap: 1.2rem; font-size: .78rem;" *ngIf="!cargando">
+    <span><span class="calendar-dot vencido mr-1"></span>Vencido</span>
+    <span><span class="calendar-dot pendiente mr-1"></span>Pendiente</span>
+    <span><span class="calendar-dot completado mr-1"></span>Completado</span>
+  </div>
+</div>
